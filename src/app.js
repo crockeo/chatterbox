@@ -10,7 +10,8 @@
 var express = require('express'),
     fs      = require('fs'),
 
-    api = require('./api.js');
+    database = require('./database.js'),
+    api      = require('./api.js');
 
 
 //////////
@@ -18,6 +19,12 @@ var express = require('express'),
 
 // Creating the app.
 var app = express();
+
+// Connecting to the database.
+var url = process.env.MONGO_URL;
+if (url === undefined)
+  url = 'mongodb://localhost/default-project';
+  database.connect(url);
 
 // Determining the port of the app.
 var port = process.env.PORT;
