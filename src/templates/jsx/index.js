@@ -13,7 +13,7 @@ var Message = React.createClass({
     // Rendering this single message.
     render: function () {
         return (
-            <p>{this.props.message}</p>
+            <p>{this.props.message.text} - <small>{this.props.message.time.toString()}</small></p>
         );
     }
 });
@@ -54,7 +54,10 @@ var ChatBox = React.createClass({
         e.preventDefault();
 
         var chatInput = this.refs.chatInput.getDOMNode();
-        socket.emit('message', chatInput.value);
+        socket.emit('message', {
+            text: chatInput.value,
+            time: new Date()
+        });
         chatInput.value = '';
     },
 
