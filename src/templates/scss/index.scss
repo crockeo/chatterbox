@@ -1,10 +1,38 @@
 @import 'config';
 
 .left-pane {
+    min-height: 100%;
+    padding: 0px;
 }
 
 .right-pane {
     box-shadow: -2px 0px 0px $darkColor;
     background: #eeeeee;
-    margin-top: 2px;
+    min-height: 100%;
+}
+
+.chatMessages {
+
+}
+
+.chatForm {
+    background: $darkColor;
+    padding: 4px;
+    margin: 0px;
+}
+
+.chatInput {
+    padding: 8px;
+    border: none;
+    height: 48px;
+    width: 90%;
+}
+
+.chatButton {
+    background: $lightColor;
+    border-radius: 0px;
+    border-style: none;
+    height: 48px;
+    color: #fff;
+    width: 10%;
 }

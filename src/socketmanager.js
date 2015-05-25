@@ -12,8 +12,12 @@ function initSocket(socket) {
     // TODO: Initialization stuff.
     console.log('Initializing a socket.');
 
-    socket.on('disconnect', function () {
+    socket.on('message', function (msg) {
+        console.log('Received message: ' + msg);
+    });
 
+    socket.on('disconnect', function () {
+        console.log('Disconnecting a socket');
     });
 }
 
