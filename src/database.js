@@ -6,7 +6,8 @@
 
 /////////////
 // Imports //
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+    bcrypt   = require('bcrypt');
 
 //////////
 // Code //
@@ -14,9 +15,29 @@ var mongoose = require('mongoose');
 // Connecting to a given database at a given connection url.
 function connect(connUrl) { mongoose.connect(connUrl); }
 
+// Creating a bunch of the raw schema.
+var UserSchema = mongoose.Schema({
+    username: String,
+    password: String
+})
+
+UserSchema.methods.hashMe = function (callback) {
+    if (callback === undefined)
+        return;
+
+    bcrypt.hash(this.username + this.password, 10, function (err, hash) {
+        if (err) {
+            callback(err, '');
+            return;
+        }
+
+        callback(null, hash);
+    });
+}
+
 // The schema to be used in the database.
 var schema = {
-
+    User: mongoose.model('User', UserSchema)
 };
 
 /////////////

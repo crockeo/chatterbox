@@ -1,0 +1,10 @@
+@import 'config';
+
+.left-pane {
+}
+
+.right-pane {
+    box-shadow: -2px 0px 0px $darkColor;
+    background: #eeeeee;
+    margin-top: 2px;
+}

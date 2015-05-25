@@ -6,9 +6,10 @@
 
 /////////////
 // Imports //
-var bodyParser = require('body-parser'),
-    express    = require('express'),
-    fs         = require('fs');
+var cookieParser = require('cookie-parser'),
+    bodyParser   = require('body-parser'),
+    express      = require('express'),
+    fs           = require('fs');
 
 //////////
 // Code //
@@ -18,6 +19,7 @@ var app = express();
 
 // Parsing POST requests as JSON.
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 // registerEndpoint registers a whole module that can contain a set of HTTP
 // methods for a single endpoint.

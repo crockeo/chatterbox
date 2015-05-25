@@ -5,7 +5,7 @@
 //   The portion of this React application that is going to be running on every
 //   single page.
 
-//
+// The login or logout entry on the top bar.
 var LoginApp = React.createClass({
     checkLogged: function () {
         var req = new XMLHttpRequest();

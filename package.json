@@ -1,30 +1,33 @@
 {
-    "name": "chatterbox",
-    "version": "0.0.0",
-    "description": "A web-based chat program using sockets.",
-    "main": "src/app.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/crockeo/chatterbox"
-    },
-    "author": "Cerek Hillen",
-    "license": "MIT",
-    "bugs": {
-        "url":"https://github.com/crockeo/chatterbox/issues"
-    },
-    "dependencies": {
-    	"body-parser": "^1.10.0",
-        "mongoose": "^3.8.20",
-        "express": "^4.10.4"
-    },
-    "devDependencies": {
-        "bower": "^1.3.12",
-        "gulp": "^3.8.10",
-        "gulp-jade": "^0.10.0",
-        "gulp-plumber": "^0.6.6",
-        "gulp-react": "^2.0.0",
-        "gulp-sass": "^1.2.4",
-        "gulp-watch": "^3.0.0",
-        "nodemon": "^1.2.1"
-    }
+  "name": "chatterbox",
+  "version": "0.0.0",
+  "description": "A web-based chat program using sockets.",
+  "main": "src/app.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/crockeo/chatterbox"
+  },
+  "author": "Cerek Hillen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/crockeo/chatterbox/issues"
+  },
+  "dependencies": {
+    "bcrypt": "^0.8.3",
+    "body-parser": "^1.10.0",
+    "cookie-parser": "^1.3.5",
+    "express": "^4.10.4",
+    "mongoose": "^3.8.20",
+    "socket.io": "^1.3.5"
+  },
+  "devDependencies": {
+    "bower": "^1.3.12",
+    "gulp": "^3.8.10",
+    "gulp-jade": "^0.10.0",
+    "gulp-plumber": "^0.6.6",
+    "gulp-react": "^2.0.0",
+    "gulp-sass": "^1.2.4",
+    "gulp-watch": "^3.0.0",
+    "nodemon": "^1.2.1"
+  }
 }
