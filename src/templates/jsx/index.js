@@ -8,12 +8,41 @@
 // The socket for this whooole page.
 var socket = io();
 
-// Displaying other people's (and your own) messages.
-var Messages = React.createClass({
+// A React component to represent a single message.
+var Message = React.createClass({
+    // Rendering this single message.
     render: function () {
         return (
-            <div className="chatMessages">
+            <p>{this.props.message}</p>
+        );
+    }
+});
 
+// Displaying other people's (and your own) messages.
+var Messages = React.createClass({
+    // Getting the initial (empty) set of messages.
+    getInitialState: function () {
+        return { messages: [] };
+    },
+
+    // Registering functionality atop the socket when the messages mount.
+    componentDidMount: function () {
+        socket.on('message' , function (msg) {
+            var newMessages = this.state.messages;
+            newMessages.push(<Message message={msg} />);
+
+            this.setState({
+                messages: newMessages
+            });
+        }.bind(this));
+    },
+
+    // Rendering the set of messages.
+    render: function () {
+        console.log(this.state.messages);
+        return (
+            <div className="chatMessages">
+                {this.state.messages}
             </div>
         );
     }
