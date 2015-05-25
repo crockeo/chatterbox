@@ -7,11 +7,14 @@
 
 /////////////
 // Imports //
-var express = require('express'),
+var io      = require('socket.io'),
+    express = require('express'),
+    http    = require('http');
     fs      = require('fs'),
 
-    database = require('./database.js'),
-    api      = require('./api.js');
+    socketManager = require('./socketmanager.js'),
+    database      = require('./database.js'),
+    api           = require('./api.js');
 
 
 //////////
@@ -52,6 +55,15 @@ app.use(function (req, res, next) {
   });
 });
 
+// Setting up socket.io
+var realHttp = http.Server(app),
+    realIo   = io(realHttp);
+
+realIo.on('connection', function (socket) {
+    socketManager.initSocket(socket);
+});
+
 // Serving the content.
-console.log('Server started on port ' + port);
-app.listen(port);
+realHttp.listen(port, function () {
+    console.log('Server started on port ' + port);
+});
