@@ -19,8 +19,8 @@ var Messages = React.createClass({
     }
 });
 
-// The Chat portion of the application.
-var Chat = React.createClass({
+var ChatBox = React.createClass({
+    // Functionality to perform when the user attempts to submit a new message.
     onSubmit: function (e) {
         e.preventDefault();
 
@@ -29,17 +29,28 @@ var Chat = React.createClass({
         chatInput.value = '';
     },
 
+    // Rendering out the ChatBox.
+    render: function () {
+        return (
+            <form onSubmit={this.onSubmit} className="chatForm">
+                <input ref="chatInput" type="text" className="chatInput" placeholder="Enter chat message" />
+                <button type="submit" className="chatButton">
+                    <span className="glyphicon glyphicon-arrow-right"></span>
+                </button>
+            </form>
+        );
+    }
+});
+
+// The Chat portion of the application.
+var Chat = React.createClass({
+    // Rendering out the whole chat portion of the application - both the
+    // Messages and the ChatBox.
     render: function () {
         return (
             <div>
                 <Messages />
-
-                <form onSubmit={this.onSubmit} className="chatForm">
-                    <input ref="chatInput" type="text" className="chatInput" placeholder="Enter chat message" />
-                    <button type="submit" className="chatButton">
-                        <span className="glyphicon glyphicon-arrow-right"></span>
-                    </button>
-                </form>
+                <ChatBox />
             </div>
         );
     }
@@ -47,7 +58,6 @@ var Chat = React.createClass({
 
 // The application to manage the list of Users.
 var UserList = React.createClass({
-
     render: function () {
         return (
             <h1>Right pane</h1>
@@ -57,6 +67,6 @@ var UserList = React.createClass({
 
 // Adding the series of React components.
 document.addEventListener('DOMContentLoaded', function () {
-    React.render(<Chat />, document.getElementById('chatApp'));
-    React.render(<UserList />, document.getElementById('userListApp'));
+    React.render(<Chat />, document.getElementById('leftPane'));
+    React.render(<UserList />, document.getElementById('rightPane'));
 });

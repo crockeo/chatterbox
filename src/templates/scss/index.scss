@@ -1,18 +1,20 @@
 @import 'config';
 
-.left-pane {
-    min-height: 100%;
-    padding: 0px;
+/* Styling the left and right panes specifically. */
+#leftPane {
+    padding: 0px 2px 0px 0px;
+    height: calc(100% - 67px);
 }
 
-.right-pane {
+#rightPane {
     box-shadow: -2px 0px 0px $darkColor;
+    height: calc(100% - 67px);
     background: #eeeeee;
-    min-height: 100%;
 }
 
+/* Stylign the portions of the app that have to deal with chat. As opposed to
+   that of user-listing. */
 .chatMessages {
-
 }
 
 .chatForm {

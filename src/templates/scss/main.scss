@@ -2,14 +2,14 @@
 
 /* Making the body section take up 100% of the screen such that one can position
    different aspects of the screen in arbitrary places. */
-html { min-height: 100%; }
-body { min-height: 100%; }
+html, body { height: 100%; }
 
 .top-bar {
     box-shadow: 0px 2px 0px $darkColor, 0px 2px 2px $darkColor;
     background: $primaryColor;
     margin-bottom: 2px;
     padding: 10px;
+    height: 65px;
 }
 
 a.top-bar-text {
