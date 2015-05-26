@@ -41,6 +41,16 @@ function initSocket(socket) {
     addSocket(socket);
 
     socket.on('message', function (msg) {
+        if (!msg.username || !msg.auth) {
+            socket.emit('message', {
+                username: 'System',
+                text: 'You must be logged in to send chat messages.',
+                time: new Date()
+            });
+
+            return;
+        }
+
         console.log('Received message: ' + msg);
         eachSocket(function (socket) {
             socket.emit('message', msg);

@@ -59,13 +59,22 @@ var ChatBox = React.createClass({
     onSubmit: function (e) {
         e.preventDefault();
 
-        var chatInput = this.refs.chatInput.getDOMNode();
-        socket.emit('message', {
-            username: username,
-            text: chatInput.value,
-            time: new Date()
-        });
-        chatInput.value = '';
+        checkLogged(function (logged) {
+            var chatInput = this.refs.chatInput.getDOMNode();
+            var auth;
+            try       { auth = JSON.parse(Cookie.get('auth')); }
+            catch (e) { auth = {} };
+
+            socket.emit('message', {
+                username: auth.username,
+                auth: auth.auth,
+                text: chatInput.value,
+                time: new Date()
+            });
+
+            if (logged)
+                chatInput.value = '';
+        }.bind(this));
     },
 
     // Rendering out the ChatBox.

@@ -10,24 +10,6 @@
 
 // The login or logout entry on the top bar.
 var LoginApp = React.createClass({
-    checkLogged: function () {
-        var req = new XMLHttpRequest();
-
-        // Using self = this as opposed to binding the function the below seeing
-        // as I wish to have a reference to 'this' pointing at the response
-        // object as well as 'self' pointing to the LoginApp.
-        var self = this;
-
-        req.onload = function () {
-            try { self.setState(JSON.parse(this.response)); }
-            catch (e) { self.setState({ logged: false }); }
-        };
-
-        req.open('GET', '/api/islogged');
-        req.setRequestHeader('Accept', 'application/json');
-        req.send();
-    },
-
     getInitialState: function () {
         return {
             logged: null
@@ -35,7 +17,9 @@ var LoginApp = React.createClass({
     },
 
     componentDidMount: function () {
-        setTimeout(this.checkLogged, 0);
+        checkLogged(function (logged) {
+            this.setState({ logged: logged });
+        }.bind(this));
     },
 
     render: function () {
@@ -45,7 +29,10 @@ var LoginApp = React.createClass({
             )
         } else if (this.state.logged === false) {
             return (
-                <a href="/login" className="top-bar-text secondary">Login</a>
+                <span>
+                    <a href="/login" className="top-bar-text secondary">Login</a>
+                    <a href="/register" className="top-bar-text secondary">Register</a>
+                </span>
             );
         } else if (this.state.logged === true) {
             return (

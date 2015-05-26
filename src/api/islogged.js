@@ -16,28 +16,35 @@ var bcrypt = require('bcrypt'),
 
 // Handling a GET request on this path.
 function get(req, res) {
-    var auth = req.cookies.auth;
+    var sauth = req.cookies.auth;
 
-    if (auth === undefined) {
+    if (sauth === undefined) {
         res.json({ logged: false });
         return;
     }
 
-    var auths = auth.split('|');
-    if (auths.length !== 2) {
+    var auth;
+    try { auth = JSON.parse(sauth); }
+    catch (e) {
         res.json({ logged: false });
         return;
     }
 
     database.schema.User.find({
-        username: auth[0]
+        username: auth.username
     }, function (err, users) {
         if (err || users.length !== 1) {
             res.json({ logged: false });
             return;
         }
 
-        res.json({ logged: auth[1] === users[0] });
+        bcrypt.compare(users[0].username + users[0].password, auth.auth, function (err, res) {
+            var ret = res;
+            if (err)
+                ret = true;
+
+            res.json({ logged: ret });
+        });
     });
 }
 
