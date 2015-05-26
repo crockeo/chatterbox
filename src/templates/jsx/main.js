@@ -5,6 +5,9 @@
 //   The portion of this React application that is going to be running on every
 //   single page.
 
+//////////
+// Code //
+
 // The login or logout entry on the top bar.
 var LoginApp = React.createClass({
     checkLogged: function () {
@@ -16,18 +19,8 @@ var LoginApp = React.createClass({
         var self = this;
 
         req.onload = function () {
-            var json = {};
-            try {
-                json = JSON.parse(this.responseText);
-            } catch (e) {
-                console.log(e);
-                json.logged = false;
-            }
-
-            if (json.logged === true)
-                self.setState({ logged: true });
-            else
-                self.setState({ logged: false });
+            try { self.setState(JSON.parse(this.response)); }
+            catch (e) { self.setState({ logged: false }); }
         };
 
         req.open('GET', '/api/islogged');

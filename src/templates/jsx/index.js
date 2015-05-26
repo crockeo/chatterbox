@@ -5,6 +5,9 @@
 //   The portion of this React application that is going to be running on every
 //   single page.
 
+//////////
+// Code //
+
 // The socket for this whooole page.
 var socket = io();
 
@@ -13,7 +16,11 @@ var Message = React.createClass({
     // Rendering this single message.
     render: function () {
         return (
-            <p>{this.props.message.text} - <small>{this.props.message.time.toString()}</small></p>
+            <p className="chatMessage">
+                <span className="chatMessageUsername">{this.props.message.username}: </span>
+                <span className="chatMessageText">{this.props.message.text}</span>
+                <span className="chatMessageTime"> - {this.props.message.time.toString()}</span>
+            </p>
         );
     }
 });
@@ -39,7 +46,6 @@ var Messages = React.createClass({
 
     // Rendering the set of messages.
     render: function () {
-        console.log(this.state.messages);
         return (
             <div className="chatMessages">
                 {this.state.messages}
@@ -55,6 +61,7 @@ var ChatBox = React.createClass({
 
         var chatInput = this.refs.chatInput.getDOMNode();
         socket.emit('message', {
+            username: username,
             text: chatInput.value,
             time: new Date()
         });

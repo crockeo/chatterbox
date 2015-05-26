@@ -15,6 +15,30 @@
 /* Styling the portions of the app that have to deal with chat. As opposed to
    that of user-listing. */
 .chatMessages {
+    padding: 0px 2px;
+    max-width: 100%;
+}
+
+.chatMessage {
+    padding: 2px;
+    margin: 0px;
+}
+
+.chatMessageUsername {
+    text-shadow: 0px 0px 1px $darkCounterColor;
+    font-weight: bold;
+    font-size: 16px;
+    color: $counterColor;
+}
+
+.chatMessageText {
+    font-size: 16px;
+    max-width: 100%;
+}
+
+.chatMessageTime {
+    font-size: 10px;
+    color: #888888;
 }
 
 .chatForm {
