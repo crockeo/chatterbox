@@ -17,8 +17,11 @@ function connect(connUrl) { mongoose.connect(connUrl); }
 
 // Creating a bunch of the raw schema.
 var UserSchema = mongoose.Schema({
+    email   : String,
     username: String,
-    password: String
+    password: String,
+    created : Date,
+    verified: Date
 })
 
 UserSchema.methods.hashMe = function (callback) {
