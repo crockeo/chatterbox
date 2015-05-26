@@ -30,8 +30,8 @@ var LoginApp = React.createClass({
         } else if (this.state.logged === false) {
             return (
                 <span>
-                    <a href="/login" className="top-bar-text secondary">Login</a>
-                    <a href="/register" className="top-bar-text secondary">Register</a>
+                    <a href="/login.html" className="top-bar-text secondary">Login</a>
+                    <a href="/register.html" className="top-bar-text secondary">Register</a>
                 </span>
             );
         } else if (this.state.logged === true) {
