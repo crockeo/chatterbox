@@ -35,9 +35,7 @@ var RegisterApp = React.createClass({
                 'Accept': 'application/json'
             },
 
-            onload: function (response) {
-                console.log(response);
-            }.bind(this)
+            onload: handleFormSubmit.bind(this)
         });
     },
 

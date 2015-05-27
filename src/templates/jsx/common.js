@@ -44,3 +44,22 @@ function checkLogged(callback) {
         }.bind(this)
     });
 }
+
+// Responding to a standard form submit. Meant to be .bind()-ed with the calling
+// React class.
+function handleFormSubmit(response) {
+    var json = JSON.parse(response);
+
+    var errorClass;
+    if (json.error)
+        errorClass = 'text-danger';
+    else if (!json.success)
+        errorClass = 'text-warning';
+    else
+        errorClass = 'text-success';
+
+    this.setState({
+        errorClass: errorClass,
+        error: json.message
+    });
+}

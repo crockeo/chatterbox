@@ -9,7 +9,7 @@
 // Code //
 
 // The login or logout entry on the top bar.
-var LoginApp = React.createClass({
+var LoginLinkApp = React.createClass({
     getInitialState: function () {
         return {
             logged: null
@@ -44,5 +44,5 @@ var LoginApp = React.createClass({
 
 // Adding the series of React components.
 document.addEventListener('DOMContentLoaded', function () {
-    React.render(<LoginApp />, document.getElementById('loginWrapper'));
+    React.render(<LoginLinkApp />, document.getElementById('loginWrapper'));
 });
