@@ -7,5 +7,5 @@ function ctrl_c() {
 }
 
 # Starting mongod and gulp.
-sudo mongod &
+sudo mongod > /dev/null &
 gulp

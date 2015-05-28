@@ -19,15 +19,24 @@ var RegisterApp = React.createClass({
             password  = this.refs.password.getDOMNode(),
             cpassword = this.refs.cpassword.getDOMNode();
 
+        if (password.value !== cpassword.value) {
+            this.setState({
+                errorClass: 'text-warning',
+                error: 'Passwords do not match.'
+            })
+
+            return;
+        } else
+            this.setState({ errorClass: '', error: '' });
+
         makeRequest({
             method: 'POST',
             path: '/api/register',
 
             body: JSON.stringify({
-                email: email,
-                username: username,
-                password: password,
-                cpassword: cpassword
+                email: email.value,
+                username: username.value,
+                password: password.value
             }),
 
             headers: {
