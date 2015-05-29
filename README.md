@@ -1,6 +1,10 @@
 # chatterbox
 
-Hey you should write something about your app!
+*chatterbox* is a web-based chat program written in Javascript using React,
+MongoDB, Node, Express, Jade, and SCSS. Its main goal is to explore the realm of
+front-end design using technologies for the web. The idea is that in its
+completed state I would want me - or any given person - to be able to look at it
+and have a hard time finding some piece of its UI that's buggy or hard to use.
 
 ### USAGE
 
@@ -23,15 +27,15 @@ Development version:
 $ gulp
 ```
 
+If you don't have a MongoDB process running on your server already, you may want
+to instead use `run.sh` which forks a `mongod` process along with starting gulp.
+
 Production:
 
 ```bash
 $ gulp deploy
 $ node src/app.js
 ```
-
-Alternatively if you want to be able to run the project in development mode
-(with automatic reloading), you can use `gulp` (with no arguments).
 
 ### LICENSE
 
