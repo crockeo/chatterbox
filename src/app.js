@@ -26,13 +26,21 @@ var app = express();
 // Connecting to the database.
 var url = process.env.MONGO_URL;
 if (url === undefined)
-  url = 'mongodb://localhost/default-project';
+  url = 'mongodb://localhost/chatterbox';
   database.connect(url);
 
 // Determining the port of the app.
 var port = process.env.PORT;
 if (port === undefined)
   port = 3000;
+
+// Switch this between true and false if you want to log / not log requests.
+if (false) {
+    app.use(function (req, res, next) {
+        console.log(new Date() + ': ' + req.method + ' - ' + req.url);
+        next();
+    });
+}
 
 // Serving static files.
 app.use('/static', express.static(__dirname + '/static'));

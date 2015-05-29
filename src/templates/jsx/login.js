@@ -21,8 +21,8 @@ var LoginApp = React.createClass({
             path: '/api/login',
 
             body: JSON.stringify({
-                email: email,
-                password: password
+                email   : email.value,
+                password: password.value
             }),
 
             headers: {
