@@ -41,9 +41,6 @@ var LoginApp = React.createClass({
 
     // Rendering the login app.
     render: function () {
-        console.log(this.state.errorClass);
-        console.log(this.state.error);
-
         return (
             <form className="col-xs-12 col-sm-12 col-md-10       col-lg-8
                                                  col-md-offset-1 col-lg-offset-2" onSubmit={this.onSubmit}>

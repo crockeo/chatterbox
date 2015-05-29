@@ -64,28 +64,3 @@ function handleFormSubmit(response) {
         error: json.message
     });
 }
-
-// Checking that all of the keys in a given array exist in a piece of JSON.
-function allExists(json, keys, callback) {
-    setTimeout(function () {
-        for (var i = 0; i < keys.length; i++) {
-            if (json[keys[i]] === undefined) {
-                callback(false);
-                return;
-            }
-        }
-
-        callback(true);
-    }, 0);
-}
-
-/////////////
-// Exports //
-
-//
-// This section is dedicated to functions specifically usable by the server.
-//
-
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports.allExists = allExists;
-}

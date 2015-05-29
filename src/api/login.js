@@ -8,8 +8,8 @@
 // Includes //
 var bcrypt = require('bcrypt'),
 
-    common   = require('../static/js/common.js'),
-    database = require('../database.js');
+    database = require('../database.js'),
+    common   = require('../common.js');
 
 //////////
 // Code //
