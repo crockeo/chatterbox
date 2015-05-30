@@ -60,9 +60,10 @@ var ChatBox = React.createClass({
         e.preventDefault();
 
         var chatInput = this.refs.chatInput.getDOMNode();
-        var auth;
-        try       { auth = JSON.parse(Cookie.get('auth')); }
-        catch (e) { auth = {} };
+        var auth      = Cookies.get('auth');
+
+        try       { auth = JSON.parse(auth); }
+        catch (e) { auth = {};               }
 
         socket.emit('message', {
             username: auth.username,
@@ -89,6 +90,14 @@ var ChatBox = React.createClass({
 
 // The Chat portion of the application.
 var Chat = React.createClass({
+    // Upon this component mounting, attempt to register this user's socket.
+    componentDidMount: function () {
+        setTimeout(function () {
+            var auth = Cookies.get('auth');
+            socket.emit('register', auth);
+        });
+    },
+
     // Rendering out the whole chat portion of the application - both the
     // Messages and the ChatBox.
     render: function () {

@@ -61,7 +61,7 @@ gulp.task('deploy-dependencies', function () {
     .pipe(gulp.dest('src/static/fonts/'));
 
   // Deploying cookie.js
-  gulp.src('bower_components/cookie-js/cookie.js')
+  gulp.src('bower_components/cookies-js/dist/cookies.min.js')
     .pipe(gulp.dest('src/static/js'));
 });
 
