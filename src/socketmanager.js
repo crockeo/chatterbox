@@ -21,6 +21,7 @@ var validated = {};
 function removeSocket(socket) {
     console.log('Removing a socket...');
 
+    delete validated[socket];
     for (var i = 0; i < sockets.length; i++) {
         if (sockets[i] == socket) {
             sockets.splice(i, 1);
@@ -66,6 +67,11 @@ function initSocket(socket) {
                     username: jCookie.username,
                     auth: jCookie.auth
                 };
+
+                // Alerting user connection.
+                eachSocket(function (socket) {
+                    socket.emit('userconnect', validated[socket].username);
+                });
 
                 socket.emit('message', serverMessage('Logged in to the server.'));
             }

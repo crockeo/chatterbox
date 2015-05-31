@@ -10,55 +10,67 @@
     box-shadow: -2px 0px 0px $darkColor;
     height: calc(100% - 67px);
     background: #eeeeee;
+    padding: 0px;
 }
 
 /* Styling the portions of the app that have to deal with chat. As opposed to
    that of user-listing. */
-.chatMessages {
+.chat-messages {
+    overflow-y: scroll;
     padding: 0px 2px;
     max-width: 100%;
+    height: 100%;
 }
 
-.chatMessage {
+.chat-message {
     padding: 2px;
     margin: 0px;
 }
 
-.chatMessageUsername {
+.chat-message-username {
     text-shadow: 0px 0px 1px $darkCounterColor;
     font-weight: bold;
     font-size: 16px;
     color: $counterColor;
 }
 
-.chatMessageText {
+.chat-message-text {
     font-size: 16px;
     max-width: 100%;
 }
 
-.chatMessageTime {
+.chat-message-time {
     font-size: 10px;
     color: #888888;
 }
 
-.chatForm {
+.chat-form {
     background: $darkColor;
     padding: 4px;
     margin: 0px;
 }
 
-.chatInput {
+.chat-input {
     padding: 8px;
     border: none;
     height: 48px;
     width: 90%;
 }
 
-.chatButton {
+.chat-button {
     background: $lightColor;
     border-radius: 0px;
     border-style: none;
     height: 48px;
     color: #fff;
     width: 10%;
+}
+
+.user-list {
+    overflow-y: scroll;
+    height: 100%;
+}
+
+.user {
+    margin: 1px;
 }

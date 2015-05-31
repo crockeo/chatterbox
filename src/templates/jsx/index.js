@@ -16,10 +16,10 @@ var Message = React.createClass({
     // Rendering this single message.
     render: function () {
         return (
-            <p className="chatMessage">
-                <span className="chatMessageUsername">{this.props.message.username}: </span>
-                <span className="chatMessageText">{this.props.message.text}</span>
-                <span className="chatMessageTime"> - {this.props.message.time.toString()}</span>
+            <p className="chat-message">
+                <span className="chat-message-username">{this.props.message.username}: </span>
+                <span className="chat-message-text">{this.props.message.text}</span>
+                <span className="chat-message-time"> - {this.props.message.time.toString()}</span>
             </p>
         );
     }
@@ -47,7 +47,7 @@ var Messages = React.createClass({
     // Rendering the set of messages.
     render: function () {
         return (
-            <div className="chatMessages">
+            <div className="chat-messages">
                 {this.state.messages}
             </div>
         );
@@ -78,9 +78,9 @@ var ChatBox = React.createClass({
     // Rendering out the ChatBox.
     render: function () {
         return (
-            <form onSubmit={this.onSubmit} className="chatForm">
-                <input ref="chatInput" type="text" className="chatInput" placeholder="Enter chat message" />
-                <button type="submit" className="chatButton">
+            <form onSubmit={this.onSubmit} className="chat-form">
+                <input ref="chatInput" type="text" className="chat-input" placeholder="Enter chat message" />
+                <button type="submit" className="chat-button">
                     <span className="glyphicon glyphicon-arrow-right"></span>
                 </button>
             </form>
@@ -115,7 +115,7 @@ var User = React.createClass({
     // Rendering this user.
     render: function () {
         return (
-            <li>{this.props.username}</li>
+            <tr><td><h4 className="text-center user">{this.props.username}</h4></td></tr>
         );
     }
 });
@@ -125,7 +125,7 @@ var UserList = React.createClass({
     // Returning the schema for this list of users.
     getInitialState: function () {
         return {
-            users: null
+            users: null // ['This', 'Is', 'A', 'Bunch', 'Of', 'Random', 'Stuff', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a']
         };
     },
 
@@ -142,8 +142,8 @@ var UserList = React.createClass({
             onload: function (response) {
                 var users;
 
-                try       { users = JSON.parse(response); }
-                catch (e) { return;                       }
+                try       { users = JSON.parse(response);                    }
+                catch (e) { console.log('Could not get user list.'); return; }
 
                 this.setState({ users: users });
                 socket.on('userconnect'   , this.userConnect);
@@ -178,9 +178,11 @@ var UserList = React.createClass({
                 users.push(<User username={this.state.users[i]} />);
 
             return (
-                <ul>
-                    {users}
-                </ul>
+                <div className="user-list">
+                    <table className="table table-striped">
+                        {users}
+                    </table>
+                </div>
             );
         }
     }
