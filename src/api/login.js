@@ -86,7 +86,7 @@ function post(req, res) {
                     res.set('Set-Cookie', 'auth=' + JSON.stringify({
                         username: user.username,
                         auth: hash
-                    }));
+                    }) + ';path=/');
 
                     res.json({
                         error  : false,
