@@ -49,7 +49,6 @@ function initSocket(socket) {
     console.log('Adding a socket...');
 
     socket.on('register', function (cookie) {
-        console.log(cookie);
         common.isLogged(cookie, function (err, logged) {
             socket.emit('message', serverMessage('Connected to the server.'));
 
@@ -59,12 +58,20 @@ function initSocket(socket) {
                 try       { jCookie = JSON.parse(cookie); }
                 catch (e) { return;                       }
 
-                validated[jCookie.auth] = true;
+                // Possible problem:
+                //   I'm not sure that JSON objects can actually keep track of
+                //   the UID of a socket. As such they might just overwrite each
+                //   other.
+                validated[socket] = {
+                    username: jCookie.username,
+                    auth: jCookie.auth
+                };
+
                 socket.emit('message', serverMessage('Logged in to the server.'));
             }
 
             socket.on('message', function (msg) {
-                if (!msg.username || !msg.auth || !validated[jCookie.auth]) {
+                if (!msg.username || !msg.auth || validated[socket] === undefined) {
                     socket.emit('message', {
                         username: 'System',
                         text: 'You must be logged in to send chat messages.',
@@ -96,6 +103,16 @@ function initSocket(socket) {
     });
 }
 
+// Returning a list of users that currently exist in the socket manager.
+function getCurrentUsers() {
+    var users = [];
+    for (var key in validated)
+        if (validated.hasOwnProperty(key))
+            users.push(validated[key].username);
+    return users;
+}
+
 /////////////
 // Exports //
-module.exports.initSocket = initSocket;
+module.exports.initSocket      = initSocket;
+module.exports.getCurrentUsers = getCurrentUsers;

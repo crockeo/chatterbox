@@ -110,12 +110,79 @@ var Chat = React.createClass({
     }
 });
 
-// The application to manage the list of Users.
-var UserList = React.createClass({
+// The React class to display a single user.
+var User = React.createClass({
+    // Rendering this user.
     render: function () {
         return (
-            <h1>Right pane</h1>
+            <li>{this.props.username}</li>
         );
+    }
+});
+
+// The application to manage the list of Users.
+var UserList = React.createClass({
+    // Returning the schema for this list of users.
+    getInitialState: function () {
+        return {
+            users: null
+        };
+    },
+
+    // Registering socket interaction on mounting this component.
+    componentDidMount: function () {
+        makeRequest({
+            method: 'GET',
+            path: '/api/currentusers',
+
+            headers: {
+                'Accept': 'application/json'
+            },
+
+            onload: function (response) {
+                var users;
+
+                try       { users = JSON.parse(response); }
+                catch (e) { return;                       }
+
+                this.setState({ users: users });
+                socket.on('userconnect'   , this.userConnect);
+                socket.on('userdisconnect', this.userDisconnect);
+            }.bind(this)
+        });
+    },
+
+    // A user connecting.
+    userConnect: function (username) {
+        this.state.users.push(username);
+    },
+
+    // A user disconnecting.
+    userDisconnect: function (username) {
+        console.log('TODO: Remove a user.')
+    },
+
+    // Rendering the user list.
+    render: function () {
+        if (this.state.users === null) {
+            return (
+                <h3 className="text-center">Loading...</h3>
+            );
+        } else if (this.state.users.length === 0) {
+            return (
+                <h3 className="text-center">No users.</h3>
+            );
+        } else {
+            var users = [];
+            for (var i = 0; i < this.state.users.length; i++)
+                users.push(<User username={this.state.users[i]} />);
+
+            return (
+                <ul>
+                    {users}
+                </ul>
+            );
+        }
     }
 })
 
