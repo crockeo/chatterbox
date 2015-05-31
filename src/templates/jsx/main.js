@@ -10,18 +10,31 @@
 
 // The login or logout entry on the top bar.
 var LoginLinkApp = React.createClass({
+    // Returning the initial state - effectively defining the schema for this
+    // app.
     getInitialState: function () {
         return {
             logged: null
         };
     },
 
+    // Checking whether or not the user is logged in after the component has
+    // been mounted.
     componentDidMount: function () {
         checkLogged(function (logged) {
             this.setState({ logged: logged });
         }.bind(this));
     },
 
+    // Removing the authorization cookie and reloading the page.
+    logout: function () {
+        Cookies.set('auth', '');
+        setTimeout(function () {
+            window.location = '/';
+        }, 500);
+    },
+
+    // Rendering the login app.
     render: function () {
         if (this.state.logged === null) {
             return (
@@ -36,7 +49,7 @@ var LoginLinkApp = React.createClass({
             );
         } else if (this.state.logged === true) {
             return (
-                <a onclick={this.logout} className="top-bar-text secondary">Logout</a>
+                <a onClick={this.logout} href='#' className="top-bar-text secondary">Logout</a>
             );
         }
     }

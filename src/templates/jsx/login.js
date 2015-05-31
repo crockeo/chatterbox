@@ -30,7 +30,15 @@ var LoginApp = React.createClass({
                 'Accept': 'application/json'
             },
 
-            onload: handleFormSubmit.bind(this)
+            onload: function (response) {
+                handleFormSubmit.bind(this)(response);
+
+                var json = JSON.parse(response);
+                setTimeout(function () {
+                    if (json.success)
+                        window.location = '/';
+                }, 500);
+            }.bind(this)
         });
     },
 

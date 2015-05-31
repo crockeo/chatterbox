@@ -49,6 +49,7 @@ function initSocket(socket) {
     console.log('Adding a socket...');
 
     socket.on('register', function (cookie) {
+        console.log(cookie);
         common.isLogged(cookie, function (err, logged) {
             socket.emit('message', serverMessage('Connected to the server.'));
 

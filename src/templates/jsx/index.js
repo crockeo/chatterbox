@@ -95,7 +95,7 @@ var Chat = React.createClass({
         setTimeout(function () {
             var auth = Cookies.get('auth');
             socket.emit('register', auth);
-        });
+        }, 0);
     },
 
     // Rendering out the whole chat portion of the application - both the

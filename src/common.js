@@ -35,7 +35,13 @@ function isLogged(cookie, callback) {
             return;
         }
 
-        var jCookie = JSON.parse(cookie);
+        var jCookie;
+
+        try { jCookie = JSON.parse(cookie);   }
+        catch (e) {
+            callback(e, false);
+            return;
+        }
 
         if (jCookie.username === undefined || jCookie.auth === undefined) {
             callback(null, false);
