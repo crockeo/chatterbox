@@ -8,8 +8,8 @@
 // Imports //
 var bcrypt = require('bcrypt')
 
-    common   = require('../static/js/common.js'),
-    database = require('../database.js');
+    database = require('../database.js'),
+    common   = require('../common.js');
 
 //////////
 // Code //
@@ -75,7 +75,7 @@ function post(req, res) {
                 return;
             }
 
-            bcrypt.hash(req.body.username, 10, function (err, hash) {
+            bcrypt.hash(req.body.password, 10, function (err, hash) {
                 if (err) {
                     res.json({
                         error: true,

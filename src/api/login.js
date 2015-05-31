@@ -51,7 +51,6 @@ function post(req, res) {
             }
 
             var user = users[0];
-            // For some reason, passwords are not comparing properly here:
             bcrypt.compare(req.body.password, user.password, function (err, same) {
                 if (err) {
                     res.json({
@@ -84,7 +83,7 @@ function post(req, res) {
                         return;
                     }
 
-                    res.set('Set-Cookie', JSON.stringify({
+                    res.set('Set-Cookie', 'auth=' + JSON.stringify({
                         username: user.username,
                         auth: hash
                     }));
