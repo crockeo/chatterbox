@@ -22,6 +22,7 @@
 /* Styling the portions of the app that have to deal with chat. As opposed to
    that of user-listing. */
 .chat-messages {
+    height: calc(100% - 56px);
     overflow-y: scroll;
     padding: 0px 2px;
     max-width: 100%;
@@ -52,6 +53,7 @@
 .chat-form {
     background: $darkColor;
     padding: 4px;
+    height: 56px;
     margin: 0px;
 }
 

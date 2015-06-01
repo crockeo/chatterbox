@@ -81,7 +81,7 @@ var Chat = React.createClass({
     // Messages and the ChatBox.
     render: function () {
         return (
-            <div>
+            <div className="max-height">
                 <Messages messages={this.props.messages} />
                 <ChatBox />
             </div>
