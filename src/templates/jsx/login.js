@@ -14,7 +14,8 @@ var LoginApp = React.createClass({
         e.preventDefault();
 
         var email    = this.refs.email.getDOMNode(),
-            password = this.refs.password.getDOMNode();
+            password = this.refs.password.getDOMNode(),
+            remember = this.refs.remember.getDOMNode();
 
         makeRequest({
             method: 'POST',
@@ -22,7 +23,8 @@ var LoginApp = React.createClass({
 
             body: JSON.stringify({
                 email   : email.value,
-                password: password.value
+                password: password.value,
+                remember: remember.checked
             }),
 
             headers: {
@@ -60,6 +62,10 @@ var LoginApp = React.createClass({
 
                 <div className="form-group">
                     <input className="form-control" ref="password" type="password" placeholder="Enter password." required />
+                </div>
+
+                <div className="form-group">
+                    <label><input ref="remember" type="checkbox" /> Stay logged in?</label>
                 </div>
 
                 <button className="btn btn-default" type="submit">Login</button>

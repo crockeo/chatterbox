@@ -16,7 +16,7 @@ var bcrypt = require('bcrypt'),
 
 // Attempting to POST to this endpoint.
 function post(req, res) {
-    common.allExists(req.body, ['email', 'password'], function (exists) {
+    common.allExists(req.body, ['email', 'password', 'remember'], function (exists) {
         if (!exists) {
             res.json({
                 error  : true,
@@ -83,11 +83,22 @@ function post(req, res) {
                         return;
                     }
 
+                    // Setting an extra value in the cookie if the user wishes
+                    // to stay logged in for an extended period of time.
+                    var expireStr = '';
+                    if (req.body.remember) {
+                        var now = new Date();
+                        now.setTime(now.getTime() + 31 * 24 * 60 * 60 * 1000);
+                        expireStr = ';expires=' + now.toUTCString();
+                    }
+
+                    // Setting the login cookie.
                     res.set('Set-Cookie', 'auth=' + JSON.stringify({
                         username: user.username,
                         auth: hash
-                    }) + ';path=/');
+                    }) + ';path=/' + expireStr);
 
+                    // Telling the user that all is well.
                     res.json({
                         error  : false,
                         success: true,
