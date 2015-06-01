@@ -21,7 +21,9 @@ var validated = {};
 function removeSocket(socket) {
     console.log('Removing a socket...');
 
-    delete validated[socket];
+    if (validated[socket.id] !== undefined)
+        delete validated[socket.id];
+
     for (var i = 0; i < sockets.length; i++) {
         if (sockets[i] == socket) {
             sockets.splice(i, 1);
@@ -51,6 +53,7 @@ function initSocket(socket) {
 
     socket.on('register', function (cookie) {
         common.isLogged(cookie, function (err, logged) {
+            sockets.push(socket);
             socket.emit('message', serverMessage('Connected to the server.'));
 
             if (!err && logged) {
@@ -59,25 +62,21 @@ function initSocket(socket) {
                 try       { jCookie = JSON.parse(cookie); }
                 catch (e) { return;                       }
 
-                // Possible problem:
-                //   I'm not sure that JSON objects can actually keep track of
-                //   the UID of a socket. As such they might just overwrite each
-                //   other.
-                validated[socket] = {
+                validated[socket.id] = {
                     username: jCookie.username,
                     auth: jCookie.auth
                 };
 
                 // Alerting user connection.
                 eachSocket(function (socket) {
-                    socket.emit('userconnect', validated[socket].username);
+                    socket.emit('userconnect', validated[socket.id].username);
                 });
 
                 socket.emit('message', serverMessage('Logged in to the server.'));
             }
 
             socket.on('message', function (msg) {
-                if (!msg.username || !msg.auth || validated[socket] === undefined) {
+                if (!msg.username || !msg.auth || validated[socket.id] === undefined) {
                     socket.emit('message', {
                         username: 'System',
                         text: 'You must be logged in to send chat messages.',
@@ -103,8 +102,6 @@ function initSocket(socket) {
 
             // Attempting to remove this socket upon a disconnect.
             socket.on('disconnect', function () { removeSocket(socket); });
-
-            sockets.push(socket);
         });
     });
 }

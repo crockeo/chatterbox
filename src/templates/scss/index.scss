@@ -1,16 +1,22 @@
 @import 'config';
 
 /* Styling the left and right panes specifically. */
+#chatApp {
+    height: calc(100% - 67px);
+    padding: 0px;
+    margin: 0px;
+}
+
 #leftPane {
     padding: 0px 2px 0px 0px;
-    height: calc(100% - 67px);
+    height: 100%;
 }
 
 #rightPane {
     box-shadow: -2px 0px 0px $darkColor;
-    height: calc(100% - 67px);
     background: #eeeeee;
     padding: 0px;
+    height: 100%;
 }
 
 /* Styling the portions of the app that have to deal with chat. As opposed to
@@ -19,7 +25,6 @@
     overflow-y: scroll;
     padding: 0px 2px;
     max-width: 100%;
-    height: 100%;
 }
 
 .chat-message {

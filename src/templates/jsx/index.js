@@ -27,28 +27,15 @@ var Message = React.createClass({
 
 // Displaying other people's (and your own) messages.
 var Messages = React.createClass({
-    // Getting the initial (empty) set of messages.
-    getInitialState: function () {
-        return { messages: [] };
-    },
-
-    // Registering functionality atop the socket when the messages mount.
-    componentDidMount: function () {
-        socket.on('message' , function (msg) {
-            var newMessages = this.state.messages;
-            newMessages.push(<Message message={msg} />);
-
-            this.setState({
-                messages: newMessages
-            });
-        }.bind(this));
-    },
-
     // Rendering the set of messages.
     render: function () {
+        var messages = [];
+        for (var i = 0; i < this.props.messages.length; i++)
+            messages.push(<Message message={this.props.messages[i]} />);
+
         return (
             <div className="chat-messages">
-                {this.state.messages}
+                {messages}
             </div>
         );
     }
@@ -90,20 +77,12 @@ var ChatBox = React.createClass({
 
 // The Chat portion of the application.
 var Chat = React.createClass({
-    // Upon this component mounting, attempt to register this user's socket.
-    componentDidMount: function () {
-        setTimeout(function () {
-            var auth = Cookies.get('auth');
-            socket.emit('register', auth);
-        }, 0);
-    },
-
     // Rendering out the whole chat portion of the application - both the
     // Messages and the ChatBox.
     render: function () {
         return (
             <div>
-                <Messages />
+                <Messages messages={this.props.messages} />
                 <ChatBox />
             </div>
         );
@@ -122,15 +101,49 @@ var User = React.createClass({
 
 // The application to manage the list of Users.
 var UserList = React.createClass({
-    // Returning the schema for this list of users.
-    getInitialState: function () {
+    // Rendering the user list.
+    render: function () {
+        if (this.props.users === null) {
+            return (
+                <h3 className="text-center">Loading...</h3>
+            );
+        } else if (this.props.users.length === 0) {
+            return (
+                <h3 className="text-center">No users.</h3>
+            );
+        } else {
+            var users = [];
+            for (var i = 0; i < this.props.users.length; i++)
+                users.push(<User username={this.props.users[i]} />);
+
+            return (
+                <div className="user-list">
+                    <table className="table table-striped">
+                        {users}
+                    </table>
+                </div>
+            );
+        }
+    }
+});
+
+// A parent app that wraps around the chat and user list.
+var ChatApp = React.createClass({
+    // Getting the initial state and defining the schema for the rest of the
+    // application.
+    getInitialState: function() {
         return {
-            users: null // ['This', 'Is', 'A', 'Bunch', 'Of', 'Random', 'Stuff', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a']
+            messages: [],
+            users: null
         };
     },
 
-    // Registering socket interaction on mounting this component.
+    // Setting up socket messaging after the component has been mounted.
     componentDidMount: function () {
+        socket.on('message'       , this.newMessage);
+        socket.on('userconnect'   , this.userConnect);
+        socket.on('userdisconnect', this.userDisconnect);
+
         makeRequest({
             method: 'GET',
             path: '/api/currentusers',
@@ -146,50 +159,64 @@ var UserList = React.createClass({
                 catch (e) { console.log('Could not get user list.'); return; }
 
                 this.setState({ users: users });
-                socket.on('userconnect'   , this.userConnect);
-                socket.on('userdisconnect', this.userDisconnect);
+
+                setTimeout(function () {
+                    var auth = Cookies.get('auth');
+                    socket.emit('register', auth);
+                }, 0);
             }.bind(this)
         });
     },
 
-    // A user connecting.
+    // Adding a new message to the list of messages.
+    newMessage: function (message) {
+        var tmp = this.state.messages;
+        tmp.push(message);
+        this.setState({ messages: tmp });
+    },
+
+    // Removing a user from the set of users when they connect.
     userConnect: function (username) {
-        this.state.users.push(username);
-    },
+        if (this.state.users !== null) {
+            var tmp = this.state.users;
+            tmp.push(username);
 
-    // A user disconnecting.
-    userDisconnect: function (username) {
-        console.log('TODO: Remove a user.')
-    },
-
-    // Rendering the user list.
-    render: function () {
-        if (this.state.users === null) {
-            return (
-                <h3 className="text-center">Loading...</h3>
-            );
-        } else if (this.state.users.length === 0) {
-            return (
-                <h3 className="text-center">No users.</h3>
-            );
-        } else {
-            var users = [];
-            for (var i = 0; i < this.state.users.length; i++)
-                users.push(<User username={this.state.users[i]} />);
-
-            return (
-                <div className="user-list">
-                    <table className="table table-striped">
-                        {users}
-                    </table>
-                </div>
-            );
+            this.setState({ users: tmp });
         }
+    },
+
+    // Removing a user from the set of users when they disconnect.
+    userDisconnect: function (username) {
+        if (this.state.users !== null) {
+            var tmp = this.state.users;
+            for (var i = 0; i < tmp.length; i++) {
+                if (username === tmp[i]) {
+                    tmp.splice(i, 1);
+                    break;
+                }
+            }
+
+            this.setState({ users: tmp });
+        }
+    },
+
+    // Rendering the whole app.
+    render: function () {
+        return (
+            <div className="max-height">
+                <div id="leftPane" className="col-xs-12 col-sm-8 col-md-8 col-lg-10">
+                    <Chat messages={this.state.messages} />
+                </div>
+
+                <div id="rightPane" className="col-xs-12 col-sm-4 col-md-4 col-lg-2">
+                    <UserList users={this.state.users} />
+                </div>
+            </div>
+        );
     }
-})
+});
 
 // Adding the series of React components.
 document.addEventListener('DOMContentLoaded', function () {
-    React.render(<Chat />, document.getElementById('leftPane'));
-    React.render(<UserList />, document.getElementById('rightPane'));
+    React.render(<ChatApp />, document.getElementById('chatApp'));
 });
