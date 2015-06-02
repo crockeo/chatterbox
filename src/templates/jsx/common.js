@@ -27,24 +27,40 @@ function makeRequest(config) {
 }
 
 // Checking whether or not a user is logged in.
-function checkLogged(callback) {
-    if (typeof callback !== 'function')
-        throw new Error('Callback must be a function');
+(function (global) {
+    var checkedCookie = null;
+    var logged = null;
 
-    makeRequest({
-        method: 'GET',
-        path: '/api/islogged',
+    global.checkLogged = function (callback) {
+        if (typeof callback !== 'function')
+            throw new Error('Callback must be a function.');
 
-        headers: {
-            'Accept': 'application/json'
-        },
+        var authCookie = Cookies.get('auth');
+        if (authCookie === checkedCookie && logged !== null) {
+            callback(logged);
+            return;
+        }
 
-        onload: function (response) {
-            try       { callback(JSON.parse(response).logged); }
-            catch (e) { callback(false);                       }
-        }.bind(this)
-    });
-}
+        makeRequest({
+            method: 'GET',
+            path: '/api/islogged',
+
+            headers: {
+                'Accept': 'application/json'
+            },
+
+            onload: function (response) {
+                var json;
+                try       { json = JSON.parse(response); }
+                catch (e) { callback(false); return;     }
+
+                checkedCookie = authCookie;
+                logged = json.logged;
+                callback(logged);
+            }
+        });
+    }
+})(typeof window === undefined ? this : window);
 
 // Responding to a standard form submit. Meant to be .bind()-ed with the calling
 // React class.
