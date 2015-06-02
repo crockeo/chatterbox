@@ -91,7 +91,8 @@ function post(req, res) {
                     username: req.body.username,
                     password: hash,
                     created : new Date(),
-                    verified: null
+                    verified: null,
+                    picture : 'blank_user_profile.png'
                 }).save(function (err) {
                     if (err) {
                         res.json({

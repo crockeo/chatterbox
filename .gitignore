@@ -1,4 +1,8 @@
 # Ignoring some generated files.
 node_modules/
 bower_components/
-src/static/
+src/static/*
+
+# Making sure we have whatever static images we want.
+!src/static/img/
+!src/static/img/*

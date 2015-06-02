@@ -58,7 +58,7 @@ function isLogged(cookie, callback) {
 
             var user = users[0];
             bcrypt.compare(user.username + user.password, jCookie.auth, function (err, res) {
-                callback(err, res);
+                callback(err, res, user);
             });
         })
     }, 0);

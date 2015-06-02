@@ -42,8 +42,9 @@ function eachSocket(fn) {
 function serverMessage(msg) {
     return {
         username: 'System',
-        text: msg,
-        time: new Date()
+        picture : 'system.png',
+        text    : msg,
+        time    : new Date()
     };
 }
 
@@ -52,7 +53,7 @@ function initSocket(socket) {
     console.log('Adding a socket...');
 
     socket.on('register', function (cookie) {
-        common.isLogged(cookie, function (err, logged) {
+        common.isLogged(cookie, function (err, logged, userinfo) {
             sockets.push(socket);
             socket.emit('message', serverMessage('Connected to the server.'));
 
@@ -64,7 +65,8 @@ function initSocket(socket) {
 
                 validated[socket.id] = {
                     username: jCookie.username,
-                    auth: jCookie.auth
+                    picture : userinfo ? userinfo.picture : undefined,
+                    auth    : jCookie.auth
                 };
 
                 // Alerting user connection.
@@ -76,12 +78,8 @@ function initSocket(socket) {
             }
 
             socket.on('message', function (msg) {
-                if (!msg.username || !msg.auth || validated[socket.id] === undefined) {
-                    socket.emit('message', {
-                        username: 'System',
-                        text: 'You must be logged in to send chat messages.',
-                        time: new Date()
-                    });
+                if (!msg.auth || validated[socket.id] === undefined) {
+                    socket.emit('message', serverMessage('You must be logged in to send chat messages.'));
 
                     return;
                 }
@@ -93,9 +91,10 @@ function initSocket(socket) {
                 // information.
                 eachSocket(function (socket) {
                     socket.emit('message', {
-                        username: msg.username,
-                        text: msg.text,
-                        time: msg.time
+                        username: validated[socket.id].username,
+                        picture : validated[socket.id].picture ? validated[socket.id].picture : 'blank_user_profile.jpg',
+                        text    : msg.text,
+                        time    : msg.time
                     });
                 });
             });

@@ -29,15 +29,16 @@
 }
 
 .chat-message {
-    padding: 2px;
+    padding: 3px;
     margin: 0px;
 }
 
-.chat-message-username {
-    text-shadow: 0px 0px 1px $darkCounterColor;
-    font-weight: bold;
-    font-size: 16px;
-    color: $counterColor;
+.chat-profile-container {
+}
+
+.chat-colon {
+    font-size: 30px;
+    padding-right: 6px;
 }
 
 .chat-message-text {
