@@ -46,31 +46,49 @@ var LoginApp = React.createClass({
 
     // Getting the initial state of the login app.
     getInitialState: function () {
-        return { errorClass: '', error: '' };
+        return {
+            errorClass: '',
+            logged: null,
+            error: ''
+        };
+    },
+
+    // Attempting to ascertain the status of whether or not the user is logged
+    // in.
+    componentDidMount: function () {
+        checkLogged(function (logged) {
+            this.setState({ logged: logged });
+        }.bind(this));
     },
 
     // Rendering the login app.
     render: function () {
-        return (
-            <form className="col-xs-12 col-sm-12 col-md-10       col-lg-8
-                                                 col-md-offset-1 col-lg-offset-2" onSubmit={this.onSubmit}>
-                <label className={this.state.errorClass}>{this.state.error}</label>
+        if (this.state.logged === null) {
+            return <h3 className="text-center">...</h3>
+        } else if (this.state.logged) {
+            return <h3 className="text-center">You must log out before you log back in.</h3>
+        } else {
+            return (
+                <form className="col-xs-12 col-sm-12 col-md-10       col-lg-8
+                                                     col-md-offset-1 col-lg-offset-2" onSubmit={this.onSubmit}>
+                    <label className={this.state.errorClass}>{this.state.error}</label>
 
-                <div className="form-group">
-                    <input className="form-control" ref="email" type="email" placeholder="Enter email." required />
-                </div>
+                    <div className="form-group">
+                        <input className="form-control" ref="email" type="email" placeholder="Enter email." required />
+                    </div>
 
-                <div className="form-group">
-                    <input className="form-control" ref="password" type="password" placeholder="Enter password." required />
-                </div>
+                    <div className="form-group">
+                        <input className="form-control" ref="password" type="password" placeholder="Enter password." required />
+                    </div>
 
-                <div className="form-group">
-                    <label><input ref="remember" type="checkbox" /> Stay logged in?</label>
-                </div>
+                    <div className="form-group">
+                        <label><input ref="remember" type="checkbox" /> Stay logged in?</label>
+                    </div>
 
-                <button className="btn btn-default" type="submit">Login</button>
-            </form>
-        );
+                    <button className="btn btn-default" type="submit">Login</button>
+                </form>
+            );
+        }
     }
 });
 
