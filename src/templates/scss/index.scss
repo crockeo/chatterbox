@@ -1,6 +1,8 @@
 @import 'config';
 
-/* Styling the left and right panes specifically. */
+/*
+ * Styling the left and right panes specifically.
+ */
 #chatApp {
     height: calc(100% - 67px);
     padding: 0px;
@@ -19,8 +21,10 @@
     height: 100%;
 }
 
-/* Styling the portions of the app that have to deal with chat. As opposed to
-   that of user-listing. */
+/*
+ * Styling the portions of the app that have to deal with chat. As opposed to
+ * that of user-listing.
+ */
 .chat-messages {
     height: calc(100% - 56px);
     overflow-y: scroll;
@@ -31,9 +35,23 @@
 .chat-message {
     padding: 3px;
     margin: 0px;
+    box-shadow: 0px 1px 0px #333;
 }
 
 .chat-profile-container {
+    display: inline-block;
+    border-radius: 25px;
+    margin-right: 4px;
+    background: #eee;
+    height: 50px;
+    width: 50px;
+}
+
+.chat-profile-picture {
+    border-radius: 25px;
+    border-style: solid;
+    border-color: #333;
+    border-width: 2px;
 }
 
 .chat-colon {

@@ -21,11 +21,10 @@ var Message = React.createClass({
                     <img src={"/static/img/profiles/" + this.props.message.picture}
                          title={this.props.message.username}
                          alt={this.props.message.username}
+                         className="chat-profile-picture"
                          height="50"
                          width="50" />
                 </span>
-
-                <span className="chat-colon">:</span>
 
                 <span className="chat-message-text">{this.props.message.text}</span>
                 <span className="chat-message-time"> - {this.props.message.time.toString()}</span>
