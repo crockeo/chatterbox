@@ -21,8 +21,13 @@ var validated = {};
 function removeSocket(socket) {
     console.log('Removing a socket...');
 
-    if (validated[socket.id] !== undefined)
+    if (validated[socket.id] !== undefined) {
+        eachSocket(function (outSocket) {
+            outSocket.emit('userdisconnect', validated[socket.id].username);
+        });
+
         delete validated[socket.id];
+    }
 
     for (var i = 0; i < sockets.length; i++) {
         if (sockets[i] == socket) {
@@ -70,8 +75,8 @@ function initSocket(socket) {
                 };
 
                 // Alerting user connection.
-                eachSocket(function (socket) {
-                    socket.emit('userconnect', validated[socket.id].username);
+                eachSocket(function (outSocket) {
+                    outSocket.emit('userconnect', validated[socket.id].username);
                 });
 
                 socket.emit('message', serverMessage('Logged in to the server.'));
@@ -89,8 +94,8 @@ function initSocket(socket) {
                 // Propagating the contents of the message back out to the
                 // rest of the sockets - while removing any sensitive
                 // information.
-                eachSocket(function (socket) {
-                    socket.emit('message', {
+                eachSocket(function (outSocket) {
+                    outSocket.emit('message', {
                         username: validated[socket.id].username,
                         picture : validated[socket.id].picture ? validated[socket.id].picture : 'blank_user_profile.jpg',
                         text    : msg.text,

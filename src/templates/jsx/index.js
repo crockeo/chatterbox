@@ -199,6 +199,7 @@ var ChatApp = React.createClass({
             var tmp = this.state.users;
             for (var i = 0; i < tmp.length; i++) {
                 if (username === tmp[i]) {
+                    console.log('Removing');
                     tmp.splice(i, 1);
                     break;
                 }
