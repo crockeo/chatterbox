@@ -59,7 +59,7 @@ function makeRequest(config) {
                 callback(logged);
             }
         });
-    }
+    };
 })(typeof window === undefined ? this : window);
 
 // Responding to a standard form submit. Meant to be .bind()-ed with the calling
@@ -80,3 +80,24 @@ function handleFormSubmit(response) {
         error: json.message
     });
 }
+
+// Getting a given query parameter from the URL.
+(function (global) {
+    var cache = {};
+
+    global.getQueryParam = function(name) {
+        if (cache[name] !== undefined)
+            return cache(name);
+
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
+            results = regex.exec(location.search);
+
+        if (results === null)
+            cache[name] = '';
+        else
+            cache[name] = decodeURIComponent(results[1].replace(/\+/g, ' '));
+
+        return cache[name];
+    };
+})(typeof window === undefined ? this : window);

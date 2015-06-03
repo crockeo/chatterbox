@@ -49,7 +49,10 @@ var LoginLinkApp = React.createClass({
             );
         } else if (this.state.logged === true) {
             return (
-                <a onClick={this.logout} href='#' className="top-bar-text secondary">Logout</a>
+                <span>
+                    <a href="/profile.html" className="top-bar-text secondary">Profile</a>
+                    <a onClick={this.logout} href='#' className="top-bar-text secondary">Logout</a>
+                </span>
             );
         }
     }
