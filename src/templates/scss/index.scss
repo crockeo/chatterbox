@@ -16,7 +16,7 @@
 
 #rightPane {
     box-shadow: -2px 0px 0px $darkColor;
-    background: #eeeeee;
+    background: $lighterColor;
     padding: 0px;
     height: 100%;
 }
@@ -52,6 +52,8 @@
     border-style: solid;
     border-color: #333;
     border-width: 2px;
+    height: 50px;
+    width: 50px;
 }
 
 .chat-colon {
@@ -91,6 +93,10 @@
     color: #fff;
     width: 10%;
 }
+
+/*
+ * Styling the user list portion of the app.
+ */
 
 .user-list {
     overflow-y: scroll;

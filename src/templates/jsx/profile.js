@@ -8,6 +8,32 @@
 //////////
 // Code //
 
+// Doing the primary rendering & page interaction for the profile page.
+var ProfilePage = React.createClass({
+    render: function () {
+        console.log(this.props.user);
+        console.log(this.props.yours);
+
+        return (
+            <div className="max-height">
+                <div className="left-bar">
+                    <span className="profile-container">
+                        <img src={'/static/img/profiles/' + this.props.user.picture}
+                             alt={this.props.user.profile}
+                             className="profile-picture" />
+
+                        <h3 className="text-center">{this.props.user.username}&#39;s Profile</h3>
+                    </span>
+                </div>
+
+                <div className="right-bar">
+                    <h2>Rawr</h2>
+                </div>
+            </div>
+        );
+    }
+});
+
 // The primary profile app.
 var ProfileApp = React.createClass({
     // Defining the initial schema of the profile.
@@ -59,9 +85,8 @@ var ProfileApp = React.createClass({
             return <h2 className="text-center">...</h2>
         else if (this.state.responseData.user === undefined)
             return <h2 className="text-center">Failed to load user data: {this.state.responseData.message}</h2>
-        else {
-            return <h2 className="text-center">Fill in the rest.</h2>
-        }
+        else
+            return <ProfilePage user={this.state.responseData.user} yours={this.state.yours} />
     }
 });
 
