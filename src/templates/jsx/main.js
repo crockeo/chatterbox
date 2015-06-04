@@ -31,7 +31,7 @@ var LoginLinkApp = React.createClass({
         Cookies.set('auth', '');
         setTimeout(function () {
             window.location = '/';
-        }, 500);
+        }, GLOBAL_REDIRECT_TIME);
     },
 
     // Rendering the login app.

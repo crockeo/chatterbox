@@ -3,9 +3,9 @@
 # Closing mongod upon ending this script.
 trap ctrl_c INT
 function ctrl_c() {
-    sudo kill $(pgrep mongod)
+    kill $(pgrep mongod)
 }
 
 # Starting mongod and gulp.
-sudo mongod > /dev/null &
+mongod > /dev/null &
 gulp

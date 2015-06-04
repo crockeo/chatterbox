@@ -44,7 +44,15 @@ var RegisterApp = React.createClass({
                 'Accept': 'application/json'
             },
 
-            onload: handleFormSubmit.bind(this)
+            onload: function (response) {
+                handleFormSubmit.bind(this)(response);
+
+                var json = JSON.parse(response);
+                setTimeout(function () {
+                    if (json.success)
+                        window.location = '/';
+                }, GLOBAL_REDIRECT_TIME);
+            }.bind(this)
         });
     },
 

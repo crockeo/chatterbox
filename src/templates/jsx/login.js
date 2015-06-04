@@ -39,7 +39,7 @@ var LoginApp = React.createClass({
                 setTimeout(function () {
                     if (json.success)
                         window.location = '/';
-                }, 500);
+                }, GLOBAL_REDIRECT_TIME);
             }.bind(this)
         });
     },

@@ -8,6 +8,9 @@
 //////////
 // Code //
 
+// The global time that redirects should take to start (in milliseconds).
+GLOBAL_REDIRECT_TIME = 100;
+
 // Making an AJAX request to a given URL.
 function makeRequest(config) {
     var req = new XMLHttpRequest();

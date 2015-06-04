@@ -64,7 +64,40 @@ function isLogged(cookie, callback) {
     }, 0);
 }
 
+// Generating an authorization cookie from a username and password pair.
+function generateAuthCookie(body, callback) {
+    // Ensuring that we have all mandatory parts of the body. I choose to use a
+    // single value as opposed to a bunch of arguments so that I can directly
+    // call it on req.body in some cases.
+    if (typeof body.username !== 'string' || typeof body.password !== 'string') {
+        callback(err, '');
+        return;
+    }
+
+    bcrypt.hash(body.username + body.password, 10, function (err, hash) {
+        if (err) {
+            callback(err, '');
+            return;
+        }
+
+        // Setting an extra value in the cookie if the user wishes
+        // to stay logged in for an extended period of time.
+        var expireStr = '';
+        if (body.remember) {
+            var now = new Date();
+            now.setTime(now.getTime() + 31 * 24 * 60 * 60 * 1000);
+            expireStr = ';expires=' + now.toUTCString();
+        }
+
+        callback(null, 'auth=' + JSON.stringify({
+            username: body.username,
+            auth: hash
+        }) + ';path=/' + expireStr);
+    });
+}
+
 /////////////
 // Exports //
-module.exports.allExists = allExists;
-module.exports.isLogged  = isLogged;
+module.exports.allExists          = allExists;
+module.exports.isLogged           = isLogged;
+module.exports.generateAuthCookie = generateAuthCookie;

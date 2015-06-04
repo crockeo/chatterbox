@@ -104,10 +104,27 @@ function post(req, res) {
                         return;
                     }
 
-                    res.json({
-                        error: false,
-                        success: true,
-                        message: 'Registered your account!'
+                    common.generateAuthCookie({
+                        username: req.body.username,
+                        password: hash,
+                        remember: true
+                    }, function (err, authCookie) {
+                        if (err) {
+                            res.json({
+                                error: false,
+                                success: true,
+                                message: 'Registered your account, but could not automatically log you in.'
+                            });
+
+                            return;
+                        }
+
+                        res.set('Set-Cookie', authCookie);
+                        res.json({
+                            error: false,
+                            success: true,
+                            message: 'Registered your account!'
+                        })
                     });
                 });
             });
