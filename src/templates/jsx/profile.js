@@ -12,39 +12,55 @@
 var ProfileApp = React.createClass({
     // Defining the initial schema of the profile.
     getInitialState: function () {
-        return { userData: null }
+        return {
+            responseData: null,
+            yours: null
+        };
     },
 
     // Attempting to retrieve information about the user.
     componentDidMount: function () {
-        makeRequest({
-            method: 'GET',
-            path: '/api/user?username=' + this.props.username,
+        if (this.props.username !== null) {
+            makeRequest({
+                method: 'GET',
+                path: '/api/user?username=' + this.props.username,
 
-            headers: {
-                'Accept': 'application/json'
-            },
+                headers: {
+                    'Accept': 'application/json'
+                },
 
-            onload: function (response) {
-                var json;
-                try       { json = JSON.parse(response); }
-                catch (e) { json = {};                   }
+                onload: function (response) {
+                    var json;
+                    try       { json = JSON.parse(response); }
+                    catch (e) { json = {};                   }
 
-                this.setState({ userData: json });
-            }.bind(this)
-        });
+                    if (json.user === undefined)
+                        this.setState({ responseData: json });
+                    else {
+                        var auth = Cookies.get('auth');
+                        try       { auth = JSON.parse(auth); }
+                        catch (e) { auth = {};               }
+
+                        this.setState({
+                            responseData: json,
+                            yours: auth !== {} && this.props.username === auth.username
+                        });
+                    }
+                }.bind(this)
+            });
+        }
     },
 
     // Rendering the ProfileApp.
     render: function () {
-        if (this.props.username === null) {
-            return (
-                <h2 className="text-center">You must either be logged in or specify a user account.</h2>
-            )
-        } else {
-            return (
-                <h2>{this.props.username} - Nothing here mayne.</h2>
-            );
+        if (this.props.username === null)
+            return <h2 className="text-center">You must either be logged in or specify a user account.</h2>
+        else if (this.state.responseData === null)
+            return <h2 className="text-center">...</h2>
+        else if (this.state.responseData.user === undefined)
+            return <h2 className="text-center">Failed to load user data: {this.state.responseData.message}</h2>
+        else {
+            return <h2 className="text-center">Fill in the rest.</h2>
         }
     }
 });
