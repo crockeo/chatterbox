@@ -6,6 +6,51 @@
 html, body { height: 100%; }
 
 /*
+ * Generic fade in / fade out styles.
+ */
+@-webkit-keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@-moz-keyframes    fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes         fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+@-webkit-keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+@-moz-keyframes    fadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes         fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+$fadeDuration: 0.08s;
+
+.fade-in {
+    opacity: 0;
+
+    -webkit-animation: fadeIn ease-in 1;
+    -moz-animation: fadeIn ease-in 1;
+    animation: fadeIn ease-in 1;
+
+    -webkit-animation-fill-mode: forwards;
+    -moz-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+
+    -webkit-animation-duration: $fadeDuration;
+    -moz-animation-duration: $fadeDuration;
+    animation-duration: $fadeDuration;
+}
+
+.fade-out {
+    opacity: 1;
+
+    -webkit-animation: fadeOut ease-in 1;
+    -moz-animation: fadeOut ease-in 1;
+    animation: fadeOut ease-in 1;
+
+    -webkit-animation-fill-mode: forwards;
+    -moz-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+
+    -webkit-animation-duration: $fadeDuration;
+    -moz-animation-duration: $fadeDuration;
+    animation-duration: $fadeDuration;
+}
+
+/*
  * Styling the top bar.
  */
 .top-bar {
@@ -35,28 +80,7 @@ a.top-bar-text.secondary {
 /*
  * Styling window-wide overlay form.
  */
- @-webkit-keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
- @-moz-keyframes    fadeIn { from { opacity: 0; } to { opacity: 1; } }
- @keyframes         fadeIn { from { opacity: 0; } to { opacity: 1; } }
- $fadeDuration: 0.08s;
-
 .overlay-container {
-    /* Making the overlay fade in. */
-    opacity:0;
-
-    -webkit-animation:fadeIn ease-in 1;
-    -moz-animation:fadeIn ease-in 1;
-    animation:fadeIn ease-in 1;
-
-    -webkit-animation-fill-mode: forwards;
-    -moz-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-
-    -webkit-animation-duration: $fadeDuration;
-    -moz-animation-duration: $fadeDuration;
-    animation-duration: $fadeDuration;
-
-    /* Other styling */
     position: absolute;
     height: 100%;
     width: 100%;
