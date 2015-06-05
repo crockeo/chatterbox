@@ -56,7 +56,7 @@ var LoginApp = React.createClass({
     // Rendering the LoginApp.
     render: function () {
         return (
-            <div className="overlay-container">
+            <div className={'overlay-container ' + this.props.fadeClass}>
                 <div onClick={this.props.exit} className="overlay-background"></div>
 
                 <div className="overlay-form-container">
@@ -143,7 +143,7 @@ var RegisterApp = React.createClass({
     // Rendering the RegisterApp.
     render: function () {
         return (
-            <div className="overlay-container">
+            <div className={'overlay-container ' + this.props.fadeClass}>
                 <div onClick={this.props.exit} className="overlay-background"></div>
 
                 <div className="overlay-form-container">
@@ -179,9 +179,11 @@ var RegisterApp = React.createClass({
 var OverlayManager = React.createClass({
     render: function () {
         if (this.props.showLogin)
-            return <LoginApp exit={this.props.exitLogin} />
+            return <LoginApp exit={this.props.exitLogin}
+                             fadeClass={this.props.closeLogin ? 'fade-out' : 'fade-in'} />
         else if (this.props.showRegister)
-            return <RegisterApp exit={this.props.exitRegister} />
+            return <RegisterApp exit={this.props.exitRegister}
+                                fadeClass={this.props.closeRegister ? 'fade-out' : 'fade-in'} />
         else
             return <span></span>
     }
@@ -195,7 +197,9 @@ var LoginLinkApp = React.createClass({
         return {
             logged: null,
             showLogin: false,
-            showRegister: false
+            closeLogin: false,
+            showRegister: false,
+            closeRegister: false
         };
     },
 
@@ -205,6 +209,34 @@ var LoginLinkApp = React.createClass({
         checkLogged(function (logged) {
             this.setState({ logged: logged });
         }.bind(this));
+    },
+
+    // Exitting the login overlay.
+    exitLogin: function () {
+        this.setState({
+            closeLogin: true
+        });
+
+        setTimeout(function () {
+            this.setState({
+                showLogin: false,
+                closeLogin: false
+            })
+        }.bind(this), 100);
+    },
+
+    // Exiting the registration overlay.
+    exitRegister: function () {
+        this.setState({
+            closeRegister: true
+        });
+
+        setTimeout(function () {
+            this.setState({
+                showRegister: false,
+                closeRegister: false
+            })
+        }.bind(this), 100);
     },
 
     // Removing the authorization cookie and reloading the page.
@@ -225,9 +257,11 @@ var LoginLinkApp = React.createClass({
             return (
                 <span>
                     <OverlayManager showLogin={this.state.showLogin}
-                                    exitLogin={function () { this.setState({ showLogin: false }); }.bind(this)}
+                                    closeLogin={this.state.closeLogin}
+                                    exitLogin={this.exitLogin}
                                     showRegister={this.state.showRegister}
-                                    exitRegister={function () { this.setState({ showRegister: false }); }.bind(this)} />
+                                    closeRegister={this.state.closeRegister}
+                                    exitRegister={this.exitRegister} />
 
                     <a onClick={function () { this.setState({ showLogin: true }); }.bind(this)} href="#" className="top-bar-text secondary">Login</a>
                     <a onClick={function () { this.setState({ showRegister: true }); }.bind(this)} href="#" className="top-bar-text secondary">Register</a>
