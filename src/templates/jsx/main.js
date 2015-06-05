@@ -225,12 +225,12 @@ var LoginLinkApp = React.createClass({
             return (
                 <span>
                     <OverlayManager showLogin={this.state.showLogin}
-                                    exitLogin={() => this.setState({ showLogin: false }) }
+                                    exitLogin={function () { this.setState({ showLogin: false }); }.bind(this)}
                                     showRegister={this.state.showRegister}
-                                    exitRegister={() => this.setState({ showRegister: false }) } />
+                                    exitRegister={function () { this.setState({ showRegister: false }); }.bind(this)} />
 
-                    <a onClick={() => this.setState({ showLogin: true })} href="#" className="top-bar-text secondary">Login</a>
-                    <a onClick={() => this.setState({ showRegister: true })} href="#" className="top-bar-text secondary">Register</a>
+                    <a onClick={function () { this.setState({ showLogin: true }); }.bind(this)} href="#" className="top-bar-text secondary">Login</a>
+                    <a onClick={function () { this.setState({ showRegister: true }); }.bind(this)} href="#" className="top-bar-text secondary">Register</a>
                 </span>
             );
         } else if (this.state.logged === true) {

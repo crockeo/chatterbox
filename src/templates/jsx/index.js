@@ -100,7 +100,13 @@ var User = React.createClass({
     // Rendering this user.
     render: function () {
         return (
-            <tr><td><h4 className="text-center user">{this.props.username}</h4></td></tr>
+            <tr>
+                <td>
+                    <a href={'/profile.html?username=' + this.props.username}>
+                        <h4 className="text-center user">{this.props.username}</h4>
+                    </a>
+                </td>
+            </tr>
         );
     }
 });

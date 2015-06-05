@@ -35,10 +35,32 @@ a.top-bar-text.secondary {
 /*
  * Styling window-wide overlay form.
  */
+ @-webkit-keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+ @-moz-keyframes    fadeIn { from { opacity: 0; } to { opacity: 1; } }
+ @keyframes         fadeIn { from { opacity: 0; } to { opacity: 1; } }
+ $fadeDuration: 0.08s;
+
 .overlay-container {
+    /* Making the overlay fade in. */
+    opacity:0;
+
+    -webkit-animation:fadeIn ease-in 1;
+    -moz-animation:fadeIn ease-in 1;
+    animation:fadeIn ease-in 1;
+
+    -webkit-animation-fill-mode: forwards;
+    -moz-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+
+    -webkit-animation-duration: $fadeDuration;
+    -moz-animation-duration: $fadeDuration;
+    animation-duration: $fadeDuration;
+
+    /* Other styling */
     position: absolute;
     height: 100%;
     width: 100%;
+    z-index: 1;
     left: 0px;
     top: 0px;
 }
@@ -49,7 +71,7 @@ a.top-bar-text.secondary {
     opacity: 0.6;
     height: 100%;
     width: 100%;
-    z-index: 1;
+    z-index: 2;
 }
 
 .overlay-form-container {
@@ -60,7 +82,7 @@ a.top-bar-text.secondary {
     background: #fff;
     margin-top: 10%;
     width: 400px;
-    z-index: 1;
+    z-index: 2;
 }
 
 .overlay-form {
