@@ -8,13 +8,194 @@
 //////////
 // Code //
 
+// The overlay for logging in.
+var LoginApp = React.createClass({
+    // Defining the initial schema for this app.
+    getInitialState: function () {
+        return {
+            errorClass: '',
+            error: ''
+        };
+    },
+
+    // Attempting to submit login information.
+    onSubmit: function (e) {
+        e.preventDefault();
+
+        var email    = this.refs.email.getDOMNode(),
+            password = this.refs.password.getDOMNode(),
+            remember = this.refs.remember.getDOMNode();
+
+        makeRequest({
+            method: 'POST',
+            path: '/api/login',
+
+            body: JSON.stringify({
+                email   : email.value,
+                password: password.value,
+                remember: remember.checked
+            }),
+
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+
+            onload: function (response) {
+                handleFormSubmit.bind(this)(response);
+
+                var json = JSON.parse(response);
+                setTimeout(function () {
+                    if (json.success)
+                        window.location = '/';
+                }, GLOBAL_REDIRECT_TIME);
+            }.bind(this)
+        });
+    },
+
+    // Rendering the LoginApp.
+    render: function () {
+        return (
+            <div className="overlay-container">
+                <div onClick={this.props.exit} className="overlay-background"></div>
+
+                <div className="overlay-form-container">
+                    <h3>Login</h3>
+                    <form onSubmit={this.onSubmit} className="overlay-form">
+                        <label className={this.state.errorClass}>{this.state.error}</label>
+
+                        <div className="form-group">
+                            <input ref="email" className="form-control" type="email" placeholder="Enter email" required />
+                        </div>
+
+                        <div className="form-group">
+                            <input ref="password" className="form-control" type="password" placeholder="Enter password" required />
+                        </div>
+
+                        <div className="form-group">
+                            <label><input ref="remember" type="checkbox" /> Stay logged in?</label>
+                        </div>
+
+                        <button className="btn btn-default">Login</button>
+                    </form>
+                </div>
+            </div>
+        );
+    }
+});
+
+// The overlay for registration.
+var RegisterApp = React.createClass({
+    // Defining the initial state for this appliaction.
+    getInitialState: function () {
+        return {
+            errorClass: '',
+            error: ''
+        }
+    },
+
+    // Attempting to submit registration information.
+    onSubmit: function (e) {
+        e.preventDefault();
+
+        var email     = this.refs.email.getDOMNode(),
+            username  = this.refs.username.getDOMNode(),
+            password  = this.refs.password.getDOMNode(),
+            cpassword = this.refs.cpassword.getDOMNode();
+
+        if (password.value !== cpassword.value) {
+            this.setState({
+                errorClass: 'text-warning',
+                error: 'Passwords do not match.'
+            })
+
+            return;
+        } else
+            this.setState({ errorClass: '', error: '' });
+
+        makeRequest({
+            method: 'POST',
+            path: '/api/register',
+
+            body: JSON.stringify({
+                email: email.value,
+                username: username.value,
+                password: password.value
+            }),
+
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+
+            onload: function (response) {
+                handleFormSubmit.bind(this)(response);
+
+                var json = JSON.parse(response);
+                setTimeout(function () {
+                    if (json.success)
+                        window.location = '/';
+                }, GLOBAL_REDIRECT_TIME);
+            }.bind(this)
+        });
+    },
+
+    // Rendering the RegisterApp.
+    render: function () {
+        return (
+            <div className="overlay-container">
+                <div onClick={this.props.exit} className="overlay-background"></div>
+
+                <div className="overlay-form-container">
+                    <h3>Register</h3>
+                    <form onSubmit={this.onSubmit} className="overlay-form">
+                        <label className={this.state.errorClass}>{this.state.error}</label>
+
+                        <div className="form-group">
+                            <input ref="email" className="form-control" type="email" placeholder="Enter email" required />
+                        </div>
+
+                        <div className="form-group">
+                            <input ref="username" className="form-control" type="text" placeholder="Enter username" required />
+                        </div>
+
+                        <div className="form-group">
+                            <input ref="password" className="form-control" type="password" placeholder="Enter password" required />
+                        </div>
+
+                        <div className="form-group">
+                            <input ref="cpassword" className="form-control" type="password" placeholder="Confirm password" required />
+                        </div>
+
+                        <button className="btn btn-default">Register</button>
+                    </form>
+                </div>
+            </div>
+        );
+    }
+});
+
+// Managing the login & register overlays.
+var OverlayManager = React.createClass({
+    render: function () {
+        if (this.props.showLogin)
+            return <LoginApp exit={this.props.exitLogin} />
+        else if (this.props.showRegister)
+            return <RegisterApp exit={this.props.exitRegister} />
+        else
+            return <span></span>
+    }
+});
+
 // The login or logout entry on the top bar.
 var LoginLinkApp = React.createClass({
     // Returning the initial state - effectively defining the schema for this
     // app.
     getInitialState: function () {
         return {
-            logged: null
+            logged: null,
+            showLogin: false,
+            showRegister: false
         };
     },
 
@@ -43,8 +224,13 @@ var LoginLinkApp = React.createClass({
         } else if (this.state.logged === false) {
             return (
                 <span>
-                    <a href="/login.html" className="top-bar-text secondary">Login</a>
-                    <a href="/register.html" className="top-bar-text secondary">Register</a>
+                    <OverlayManager showLogin={this.state.showLogin}
+                                    exitLogin={() => this.setState({ showLogin: false }) }
+                                    showRegister={this.state.showRegister}
+                                    exitRegister={() => this.setState({ showRegister: false }) } />
+
+                    <a onClick={() => this.setState({ showLogin: true })} href="#" className="top-bar-text secondary">Login</a>
+                    <a onClick={() => this.setState({ showRegister: true })} href="#" className="top-bar-text secondary">Register</a>
                 </span>
             );
         } else if (this.state.logged === true) {
@@ -61,4 +247,5 @@ var LoginLinkApp = React.createClass({
 // Adding the series of React components.
 document.addEventListener('DOMContentLoaded', function () {
     React.render(<LoginLinkApp />, document.getElementById('loginWrapper'));
+    React.render(<OverlayManager />, document.getElementById('overlayManager'));
 });
