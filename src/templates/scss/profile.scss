@@ -10,7 +10,8 @@ $leftBarWidth: 400px;
 }
 
 /*
- * The bars.
+ * The left and ride sides of the page respectively. When not given enough width
+ * they both take up the entire width and extend downwards instead.
  */
 .left-bar {
     background: $lighterColor;
@@ -24,9 +25,7 @@ $leftBarWidth: 400px;
         padding-bottom: 8px;
         width: 100%;
     }
-}
 
-@media (max-width: $leftBarWidth) {
     .right-bar {
         width: 100%;
     }
@@ -39,16 +38,15 @@ $leftBarWidth: 400px;
         width: $leftBarWidth;
         height: 100%;
         margin: 0px;
+        float: left;
     }
- }
 
-@media (min-width: $leftBarWidth) {
     .right-bar {
-        width: calc(100% - $leftBarWidth - 2);
+        width: calc(100% - #{$leftBarWidth});
+        float: right;
         height: 100%;
     }
 }
-
 /*
  * Styling to do with the profile picture section of the profile page.
  */
