@@ -27,19 +27,11 @@ function allExists(json, keys, callback) {
     }, 0);
 }
 
-// Checking if a user is logged in given a (text) cookie.
-function isLogged(cookie, callback) {
+// Checking if a user is logged in given an already-parsed JSON cookie.
+function isLoggedJSON(jCookie, callback) {
     setTimeout(function () {
-        if (typeof cookie !== 'string') {
+        if (typeof jCookie !== 'object') {
             callback(null, false);
-            return;
-        }
-
-        var jCookie;
-
-        try { jCookie = JSON.parse(cookie);   }
-        catch (e) {
-            callback(e, false);
             return;
         }
 
@@ -61,6 +53,19 @@ function isLogged(cookie, callback) {
                 callback(err, res, user);
             });
         })
+    }, 0);
+}
+
+// Checking if a user is logged in given a (text) cookie.
+function isLogged(cookie, callback) {
+    setTimeout(function () {
+        if (typeof cookie !== 'string') {
+            callback(null, false);
+            return;
+        }
+
+        try       { isLoggedJSON(JSON.parse(cookie), callback); }
+        catch (e) { callback(e, false);                         }
     }, 0);
 }
 
@@ -99,5 +104,6 @@ function generateAuthCookie(body, callback) {
 /////////////
 // Exports //
 module.exports.allExists          = allExists;
+module.exports.isLoggedJSON       = isLoggedJSON;
 module.exports.isLogged           = isLogged;
 module.exports.generateAuthCookie = generateAuthCookie;
