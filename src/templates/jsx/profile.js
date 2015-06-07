@@ -10,9 +10,71 @@
 
 // Doing the primary rendering & page interaction for the profile page.
 var ProfilePage = React.createClass({
+    // Running some piece of code when the update profile form is submitted.
+    onSubmit: function (e) {
+        e.preventDefault();
+
+
+    },
+
+    // Setting the initial values of the form.
+    componentDidMount: function () {
+        if (this.props.yours) {
+            this.refs.username.getDOMNode().value = this.props.user.username;
+            this.refs.email   .getDOMNode().value = this.props.user.email;
+        }
+    },
+
     render: function () {
-        console.log(this.props.user);
-        console.log(this.props.yours);
+        // Setting the right side depending on whether or not the profile is
+        // yours.
+        var rightSide;
+        if (this.props.yours) {
+            rightSide = (
+                <div className="right-bar">
+                    <h2>Update Your Profile</h2>
+
+                    <form onSubmit={this.onSubmit}>
+                        <div className="form-group">
+                            <label>Username</label>
+                            <input ref="username" className="form-control" type="text" placeholder="New username." />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Email</label>
+                            <input ref="email" className="form-control" type="email" placeholder="New email." />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Change Password</label>
+                            <input ref="npassword" className="form-control" type="password" placeholder="New password." />
+                        </div>
+
+                        <div className="form-group">
+                            <input ref="cnpassword" className="form-control" type="password" placeholder="Confirm new password." />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Change Profile Picture</label>
+                            <h4>TODO: Actually implement this lol</h4>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Authenticate</label>
+                            <input ref="password" className="form-control" type="password" placeholder="Current password." />
+                        </div>
+
+                        <button className="btn btn-default" type="submit">Update Profile</button>
+                    </form>
+                </div>
+            );
+        } else {
+            rightSide = (
+                <div className="right-bar">
+                    <h2>RAWR</h2>
+                </div>
+            );
+        }
 
         return (
             <div className="max-height">
@@ -26,9 +88,7 @@ var ProfilePage = React.createClass({
                     </span>
                 </div>
 
-                <div className="right-bar">
-                    <h2>Rawr</h2>
-                </div>
+                {rightSide}
             </div>
         );
     }

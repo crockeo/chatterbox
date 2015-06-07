@@ -131,6 +131,7 @@ function post(req, res) {
                         }
 
                         user.email    = req.body.update.email    === undefined ? user.email    : req.body.update.email;
+                        user.username = req.body.update.username === undefined ? user.username : req.body.update.username;
                         user.password = req.body.update.password === undefined ? user.password : req.body.update.password;
                         user.picture  = req.body.update.picture  === undefined ? user.picture  : req.body.update.picture;
 
