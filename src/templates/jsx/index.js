@@ -33,14 +33,23 @@ var Message = React.createClass({
 
 // Displaying other people's (and your own) messages.
 var Messages = React.createClass({
+    //
+    componentDidUpdate: function (prevProps) {
+        if (prevProps.messages !== this.props.messages) {
+            var div = this.refs.chatMessages.getDOMNode();
+            div.scrollTop = div.scrollHeight;
+        }
+    },
+
     // Rendering the set of messages.
     render: function () {
         var messages = [];
         for (var i = 0; i < this.props.messages.length; i++)
-            messages.push(<Message message={this.props.messages[i]} />);
+            messages.push(<Message message={this.props.messages[i]}
+                                   key={i} />);
 
         return (
-            <div className="chat-messages">
+            <div ref="chatMessages" className="chat-messages" onScroll={this.onScroll}>
                 {messages}
             </div>
         );
@@ -129,7 +138,8 @@ var UserList = React.createClass({
         } else {
             var users = [];
             for (var i = 0; i < this.props.users.length; i++)
-                users.push(<User user={this.props.users[i]} />);
+                users.push(<User user={this.props.users[i]}
+                                 key={i} />);
 
             return (
                 <div className="user-list">
@@ -206,7 +216,6 @@ var ChatApp = React.createClass({
             var tmp = this.state.users;
             for (var i = 0; i < tmp.length; i++) {
                 if (username === tmp[i].username) {
-                    console.log('Removing');
                     tmp.splice(i, 1);
                     break;
                 }

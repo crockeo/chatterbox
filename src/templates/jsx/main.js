@@ -281,5 +281,4 @@ var LoginLinkApp = React.createClass({
 // Adding the series of React components.
 document.addEventListener('DOMContentLoaded', function () {
     React.render(<LoginLinkApp />, document.getElementById('loginWrapper'));
-    React.render(<OverlayManager />, document.getElementById('overlayManager'));
 });
