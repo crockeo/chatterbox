@@ -18,12 +18,10 @@ html, body { height: 100%; }
 
 $fadeDuration: 0.08s;
 
-.fade-in {
-    opacity: 0;
-
-    -webkit-animation: fadeIn ease-in 1;
-    -moz-animation: fadeIn ease-in 1;
-    animation: fadeIn ease-in 1;
+@mixin fade-animation($animationName) {
+    -webkit-animation: $animationName ease-in 1;
+    -moz-animation: $animationName ease-in 1;
+    animation: $animationName ease-in 1;
 
     -webkit-animation-fill-mode: forwards;
     -moz-animation-fill-mode: forwards;
@@ -34,20 +32,14 @@ $fadeDuration: 0.08s;
     animation-duration: $fadeDuration;
 }
 
+.fade-in {
+    @include fade-animation(fadeIn);
+    opacity: 0;
+}
+
 .fade-out {
+    @include fade-animation(fadeOut);
     opacity: 1;
-
-    -webkit-animation: fadeOut ease-in 1;
-    -moz-animation: fadeOut ease-in 1;
-    animation: fadeOut ease-in 1;
-
-    -webkit-animation-fill-mode: forwards;
-    -moz-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-
-    -webkit-animation-duration: $fadeDuration;
-    -moz-animation-duration: $fadeDuration;
-    animation-duration: $fadeDuration;
 }
 
 /*
@@ -57,7 +49,6 @@ $fadeDuration: 0.08s;
     box-shadow: 0px 2px 0px $darkColor, 0px 2px 2px $darkColor;
     background: linear-gradient($lightColor, $primaryColor);
     margin-bottom: 2px;
-    padding: 10px;
     height: 65px;
 }
 
@@ -72,7 +63,57 @@ a.top-bar-text.secondary {
     color: #eee;
 }
 
-/* Generic styles to be shared across a bunch of pages. */
+/*
+ * Toggling the top bar on and off.
+ */
+#toggleButton {
+    box-shadow: 0px 1px 1px $darkColor;
+    background: $lighterColor;
+    border-color: $darkColor;
+    display: inline-block;
+    border-style: solid;
+    border-radius: 8px;
+    margin-right: 14px;
+    position: absolute;
+    margin-top: 18px;
+    height: 30px;
+    float: right;
+    width: 30px;
+    right: 0px;
+    top: 0px;
+}
+
+@media (max-width: 540px) {
+    #toggleBar {
+        box-shadow: 0px 2px 0px $darkColor, 0px 2px 2px $darkColor;
+        background: $primaryColor;
+        position: relative;
+        display: none;
+        width: 100%;
+
+        &.toggle-on {
+            display: block;
+        }
+
+        &.toggle-off { }
+    }
+
+    a.top-bar-text.secondary {
+        box-shadow: 0px 1px 0px $darkColor;
+        display: block;
+        width: 100%;
+    }
+}
+
+@media (min-width: 540px) {
+    #toggleButton {
+        display: none;
+    }
+}
+
+/*
+ * Generic styles to be shared across a bunch of pages.
+ */
 .max-height {
     height: 100%;
 }

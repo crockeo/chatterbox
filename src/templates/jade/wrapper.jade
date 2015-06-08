@@ -19,7 +19,10 @@ html
             title Chatterbox
         
     body
-        div(class='top-bar')
+        .top-bar
             a.top-bar-text(href='/') Chatterbox
-            span#loginWrapper
+            span#toggleBar
+                span#loginWrapper
+                a.top-bar-text.secondary(href='http://github.com/crockeo/chatterbox' target='_blank') GitHub
+            span#menuToggleApp
         block content

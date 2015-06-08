@@ -278,7 +278,45 @@ var LoginLinkApp = React.createClass({
     }
 });
 
+// The portion of the app dedicated to toggling out the rest of the menu in the
+// event that the screen size is too limited.
+var MenuToggleApp = React.createClass({
+    getInitialState: function () {
+        return { toggled: false };
+    },
+
+    doToggle: function () {
+        if (this.state.toggled) {
+            removeClass(document.getElementById('toggleBar'), 'toggle-on');
+            addClass(document.getElementById('toggleBar'), 'toggle-off');
+        } else {
+            removeClass(document.getElementById('toggleBar'), 'toggle-off');
+            addClass(document.getElementById('toggleBar'), 'toggle-on');
+        }
+    },
+
+    onClick: function () {
+        this.setState({ toggled: !this.state.toggled });
+        this.doToggle();
+    },
+
+    render: function () {
+        var span;
+        if (this.state.toggled)
+            span = <span className="glyphicon glyphicon-menu-up"></span>
+        else
+            span = <span className="glyphicon glyphicon-menu-down"></span>
+
+        return (
+            <button onClick={this.onClick} id="toggleButton" type="button">
+                {span}
+            </button>
+        );
+    }
+});
+
 // Adding the series of React components.
 document.addEventListener('DOMContentLoaded', function () {
     React.render(<LoginLinkApp />, document.getElementById('loginWrapper'));
+    React.render(<MenuToggleApp />, document.getElementById('menuToggleApp'));
 });
