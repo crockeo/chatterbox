@@ -76,7 +76,10 @@ function initSocket(socket) {
 
                 // Alerting user connection.
                 eachSocket(function (outSocket) {
-                    outSocket.emit('userconnect', validated[socket.id].username);
+                    outSocket.emit('userconnect', {
+                        username: validated[socket.id].username,
+                        picture: validated[socket.id].picture
+                    });
                 });
 
                 socket.emit('message', serverMessage('Logged in to the server.'));

@@ -101,9 +101,12 @@ var User = React.createClass({
     render: function () {
         return (
             <tr>
-                <td>
-                    <a href={'/profile.html?username=' + this.props.username}>
-                        <h4 className="text-center user">{this.props.username}</h4>
+                <td className="user-list-row">
+                    <a href={'/profile.html?username=' + this.props.user.username}>
+                        <img src={'/static/img/profiles/' + this.props.user.picture}
+                             className="user-list-picture" />
+
+                        <span className="text-center user-list-username">{this.props.user.username}</span>
                     </a>
                 </td>
             </tr>
@@ -126,7 +129,7 @@ var UserList = React.createClass({
         } else {
             var users = [];
             for (var i = 0; i < this.props.users.length; i++)
-                users.push(<User username={this.props.users[i]} />);
+                users.push(<User user={this.props.users[i]} />);
 
             return (
                 <div className="user-list">
@@ -202,7 +205,7 @@ var ChatApp = React.createClass({
         if (this.state.users !== null) {
             var tmp = this.state.users;
             for (var i = 0; i < tmp.length; i++) {
-                if (username === tmp[i]) {
+                if (username === tmp[i].username) {
                     console.log('Removing');
                     tmp.splice(i, 1);
                     break;
