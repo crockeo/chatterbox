@@ -10,11 +10,62 @@
 
 // Doing the primary rendering & page interaction for the profile page.
 var ProfilePage = React.createClass({
+    // Getting the initial schema of the profile page.
+    getInitialState: function () {
+        return { errorClass: '', error: '' };
+    },
+
     // Running some piece of code when the update profile form is submitted.
     onSubmit: function (e) {
         e.preventDefault();
 
+        var username   = this.refs.username.getDOMNode(),
+            email      = this.refs.email.getDOMNode(),
+            npassword  = this.refs.npassword.getDOMNode(),
+            cnpassword = this.refs.cnpassword.getDOMNode(),
+            picture    = this.refs.picture.getDOMNode(),
+            password   = this.refs.password.getDOMNode();
 
+        if (npassword.value !== cnpassword.value) {
+            this.setState({
+                errorClass: 'text-warning',
+                error: 'New passwords do not match.'
+            });
+
+            return;
+        }
+
+        makeRequest({
+            method: 'POST',
+            path: '/api/user',
+
+            body: JSON.stringify({
+                auth    : Cookies.get('auth'),
+                password: password.value,
+
+                update: {
+                    username : username.value === this.props.user.username || username.value === '' ? undefined : username.value,
+                    email    : email.value    === this.props.user.email    || email.value    === '' ? undefined : email.value,
+                    npassword: npassword.value,
+                    picture  : undefined
+                }
+            }),
+
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+
+            onload: function (response) {
+                handleFormSubmit.bind(this)(response);
+
+                var json = JSON.parse(response);
+                setTimeout(function () {
+                    if (json.success)
+                        window.location = '/profile.html';
+                }, GLOBAL_REDIRECT_TIME);
+            }.bind(this)
+        });
     },
 
     // Setting the initial values of the form.
@@ -35,6 +86,8 @@ var ProfilePage = React.createClass({
                     <h2>Update Your Profile</h2>
 
                     <form onSubmit={this.onSubmit}>
+                        <label className={this.state.errorClass}>{this.state.error}</label>
+
                         <div className="form-group">
                             <label>Username</label>
                             <input ref="username" className="form-control" type="text" placeholder="New username." />
@@ -56,7 +109,7 @@ var ProfilePage = React.createClass({
 
                         <div className="form-group">
                             <label>Change Profile Picture</label>
-                            <h4>TODO: Actually implement this lol</h4>
+                            <input ref="picture" type="file" />
                         </div>
 
                         <div className="form-group">

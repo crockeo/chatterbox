@@ -63,8 +63,8 @@ function get(req, res) {
 
 // Updating information about a given user.
 function post(req, res) {
-    common.allExists(req.body, ['auth', 'password', 'update'], function (exists) {
-        if (!exists) {
+    common.allExists(req.body, ['password', 'update'], function (exists) {
+        if (req.cookies.auth === undefined || !exists) {
             res.json({
                 error: true,
                 success: false,
@@ -120,7 +120,7 @@ function post(req, res) {
                             { username: req.body.update.username }
                         ]
                     }, function (err, users) {
-                        if (err || users.length >= 0) {
+                        if (err || users.length > 0) {
                             res.json({
                                 error: err,
                                 success: false,
@@ -130,10 +130,21 @@ function post(req, res) {
                             return;
                         }
 
+                        var oldUser = JSON.stringify(user);
                         user.email    = req.body.update.email    === undefined ? user.email    : req.body.update.email;
                         user.username = req.body.update.username === undefined ? user.username : req.body.update.username;
                         user.password = req.body.update.password === undefined ? user.password : req.body.update.password;
                         user.picture  = req.body.update.picture  === undefined ? user.picture  : req.body.update.picture;
+
+                        if (JSON.stringify(user) == oldUser) {
+                            res.json({
+                                error: null,
+                                success: false,
+                                message: 'Nothing to update!'
+                            });
+
+                            return;
+                        }
 
                         user.save(function (err) {
                             if (err) {
@@ -146,10 +157,19 @@ function post(req, res) {
                                 return;
                             }
 
-                            res.json({
-                                error: null,
-                                success: true,
-                                message: 'Updated your profile.'
+                            common.generateAuthCookie({
+                                username: user.username,
+                                password: user.password,
+                                remember: true
+                            }, function (err, authCookie) {
+                                if (!err)
+                                    res.set('Set-Cookie', authCookie);
+
+                                res.json({
+                                    error: null,
+                                    success: true,
+                                    message: 'Updated your profile.'
+                                });
                             });
                         });
                     });
