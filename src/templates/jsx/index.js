@@ -59,29 +59,35 @@ var Messages = React.createClass({
 var ChatBox = React.createClass({
     // Functionality to perform when the user attempts to submit a new message.
     onSubmit: function (e) {
-        e.preventDefault();
+        if (this.props.connected) {
+            e.preventDefault();
 
-        var chatInput = this.refs.chatInput.getDOMNode();
-        var auth      = Cookies.get('auth');
+            var chatInput = this.refs.chatInput.getDOMNode();
+            var auth      = Cookies.get('auth');
 
-        try       { auth = JSON.parse(auth); }
-        catch (e) { auth = {};               }
+            try       { auth = JSON.parse(auth); }
+            catch (e) { auth = {};               }
 
-        socket.emit('message', {
-            username: auth.username,
-            auth: auth.auth,
-            text: chatInput.value,
-            time: new Date()
-        });
+            socket.emit('message', {
+                username: auth.username,
+                auth: auth.auth,
+                text: chatInput.value,
+                time: new Date()
+            });
 
-        chatInput.value = '';
+            chatInput.value = '';
+        }
     },
 
     // Rendering out the ChatBox.
     render: function () {
         return (
             <form onSubmit={this.onSubmit} className="chat-form">
-                <input ref="chatInput" type="text" className="chat-input" placeholder="Enter chat message" />
+                <input placeholder={this.props.connected ? 'Enter chat messages.' : 'Waiting for server connection...'}
+                       disabled={!this.props.connected}
+                       className="chat-input"
+                       ref="chatInput" />
+
                 <button type="submit" className="chat-button">
                     <span className="glyphicon glyphicon-arrow-right"></span>
                 </button>
@@ -98,7 +104,7 @@ var Chat = React.createClass({
         return (
             <div className="max-height">
                 <Messages messages={this.props.messages} />
-                <ChatBox />
+                <ChatBox connected={this.props.connected} />
             </div>
         );
     }
@@ -108,13 +114,19 @@ var Chat = React.createClass({
 var User = React.createClass({
     // Rendering this user.
     render: function () {
+        var userURL = '/profile.html?username=' + this.props.user.username;
+
         return (
             <tr>
-                <td className="user-list-row">
-                    <a href={'/profile.html?username=' + this.props.user.username}>
+                <td>
+                    <a href={userURL}>
                         <img src={'/static/img/profiles/' + this.props.user.picture}
                              className="user-list-picture" />
+                    </a>
+                </td>
 
+                <td className="user-list-row">
+                    <a href={userURL}>
                         <span className="text-center user-list-username">{this.props.user.username}</span>
                     </a>
                 </td>
@@ -144,7 +156,9 @@ var UserList = React.createClass({
             return (
                 <div className="user-list">
                     <table className="table table-striped">
-                        {users}
+                        <tbody>
+                            {users}
+                        </tbody>
                     </table>
                 </div>
             );
@@ -158,6 +172,7 @@ var ChatApp = React.createClass({
     // application.
     getInitialState: function() {
         return {
+            connected: true,
             messages: [],
             users: null
         };
@@ -165,32 +180,46 @@ var ChatApp = React.createClass({
 
     // Setting up socket messaging after the component has been mounted.
     componentDidMount: function () {
+        // Actual socket events.
         socket.on('message'       , this.newMessage);
         socket.on('userconnect'   , this.userConnect);
         socket.on('userdisconnect', this.userDisconnect);
 
-        makeRequest({
-            method: 'GET',
-            path: '/api/currentusers',
+        // Maintaining connection state.
+        socket.on('disconnect'    , function () { this.setState({ connected: false }); }.bind(this));
 
-            headers: {
-                'Accept': 'application/json'
-            },
+        socket.on('connect', function () {
+            this.setState({ connected: true });
 
-            onload: function (response) {
-                var users;
+            makeRequest({
+                method: 'GET',
+                path: '/api/currentusers',
 
-                try       { users = JSON.parse(response);                    }
-                catch (e) { console.log('Could not get user list.'); return; }
+                headers: {
+                    'Accept': 'application/json'
+                },
 
-                this.setState({ users: users });
+                onload: function (response) {
+                    var users;
 
-                setTimeout(function () {
+                    try       { users = JSON.parse(response);                    }
+                    catch (e) { console.log('Could not get user list.'); return; }
+
+                    this.setState({
+                        connected: true,
+                        users: users
+                    });
+
                     var auth = Cookies.get('auth');
                     socket.emit('register', auth);
-                }, 0);
-            }.bind(this)
-        });
+                }.bind(this)
+            });
+        }.bind(this));
+    },
+
+    // Functionality to represent a disconnection from the server.
+    disconnect: function () {
+        console.log('Lost contact to server.');
     },
 
     // Adding a new message to the list of messages.
@@ -230,11 +259,13 @@ var ChatApp = React.createClass({
         return (
             <div className="max-height">
                 <div id="leftPane" className="col-xs-12 col-sm-8 col-md-8 col-lg-10">
-                    <Chat messages={this.state.messages} />
+                    <Chat connected={this.state.connected}
+                          messages={this.state.messages} />
                 </div>
 
                 <div id="rightPane" className="col-xs-12 col-sm-4 col-md-4 col-lg-2">
-                    <UserList users={this.state.users} />
+                    <UserList connected={this.state.connected}
+                              users={this.state.users} />
                 </div>
             </div>
         );

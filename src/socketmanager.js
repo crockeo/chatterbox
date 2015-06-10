@@ -116,9 +116,14 @@ function initSocket(socket) {
 // Returning a list of users that currently exist in the socket manager.
 function getCurrentUsers() {
     var users = [];
-    for (var key in validated)
-        if (validated.hasOwnProperty(key))
-            users.push(validated[key].username);
+    for (var key in validated) {
+        if (validated.hasOwnProperty(key)) {
+            users.push({
+                username: validated[key].username,
+                picture: validated[key].picture
+            });
+        }
+    }
     return users;
 }
 
