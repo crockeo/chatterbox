@@ -6,13 +6,16 @@
 
 /////////////
 // Imports //
-var gulp    = require('gulp'),
-    plumber = require('gulp-plumber'),
-    watch   = require('gulp-watch'),
-    jade    = require('gulp-jade'),
-    react   = require('gulp-react'),
-    sass    = require('gulp-sass'),
-    nodemon = require('nodemon');
+var gulp       = require('gulp'),
+    plumber    = require('gulp-plumber'),
+    watch      = require('gulp-watch'),
+    jade       = require('gulp-jade'),
+    minifyHTML = require('gulp-minify-html'),
+    react      = require('gulp-react'),
+    uglify     = require('gulp-uglify'),
+    sass       = require('gulp-sass'),
+    minifyCSS  = require('gulp-minify-css'),
+    nodemon    = require('nodemon');
 
 //////////
 // Code //
@@ -25,14 +28,16 @@ gulp.task('deploy-jade', function () {
   gulp.src('src/templates/jade/**')
     .pipe(plumber())
     .pipe(jade({}))
+    .pipe(minifyHTML())
     .pipe(gulp.dest('src/static/html/'));
 });
 
-// Deploying JSX.
+// Deploying JSX.a
 gulp.task('deploy-jsx', function () {
   gulp.src('src/templates/jsx/**')
     .pipe(plumber())
     .pipe(react({}))
+    .pipe(uglify())
     .pipe(gulp.dest('src/static/js/'));
 });
 
@@ -41,6 +46,7 @@ gulp.task('deploy-scss', function () {
   gulp.src('src/templates/scss/**')
     .pipe(plumber())
     .pipe(sass())
+    .pipe(minifyCSS())
     .pipe(gulp.dest('src/static/css'));
 });
 
