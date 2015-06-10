@@ -1,3 +1,6 @@
+/*
+ * Color configuration.
+ */
 $primaryColor: #6f9090;
 $darkColor: darken($primaryColor, 5%);
 $lightColor: lighten($primaryColor, 10%);
@@ -6,3 +9,31 @@ $lighterColor: lighten($primaryColor, 45%);
 $counterColor: #906f6f;
 $darkCounterColor: darken($counterColor, 5%);
 $lightCounterColor: lighten($counterColor, 10%);
+
+/*
+ * Generic mixins for generating animations and keyframes.
+ */
+@mixin animation($animate...) {
+    $max: length($animate);
+    $animations: '';
+
+    @for $i from 1 through $max {
+        $animations: #{$animations + nth($animate, $i)};
+
+        @if $i < $max {
+            $animations: #{$animations + ', '};
+        }
+    }
+
+    -webkit-animation: $animations;
+    -moz-animation:    $animations;
+    -o-animation:      $animations;
+    animation:         $animations;
+}
+
+@mixin keyframes($animationName) {
+    @-webkit-keyframes #{$animationName} { @content; }
+    @-moz-keyframes    #{$animationName} { @content; }
+    @-o-keyframes      #{$animationName} { @content; }
+    @keyframes         #{$animationName} { @content; }
+}

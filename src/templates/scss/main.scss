@@ -8,39 +8,28 @@ html, body { height: 100%; }
 /*
  * Generic fade in / fade out styles.
  */
-@-webkit-keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@-moz-keyframes    fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes         fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-@-webkit-keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-@-moz-keyframes    fadeOut { from { opacity: 1; } to { opacity: 0; } }
-@keyframes         fadeOut { from { opacity: 1; } to { opacity: 0; } }
+@include keyframes(fadeIn)  { from { opacity: 0; } to { opacity: 1 } }
+@include keyframes(fadeOut) { from { opacity: 1; } to { opacity: 0 } }
 
 $fadeDuration: 0.08s;
 
-@mixin fade-animation($animationName) {
-    -webkit-animation: $animationName ease-in 1;
-    -moz-animation: $animationName ease-in 1;
-    animation: $animationName ease-in 1;
-
-    -webkit-animation-fill-mode: forwards;
-    -moz-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-
-    -webkit-animation-duration: $fadeDuration;
-    -moz-animation-duration: $fadeDuration;
-    animation-duration: $fadeDuration;
-}
-
 .fade-in {
-    @include fade-animation(fadeIn);
+    @include animation('fadeIn #{$fadeDuration} ease-in 1 forwards');
     opacity: 0;
 }
 
 .fade-out {
-    @include fade-animation(fadeOut);
+    @include animation('fadeOut #{$fadeDuration} ease-in 1 forwards');
     opacity: 1;
 }
+
+/*
+ * Vertical slide animations.
+ */
+@include keyframes(slideIn)  { from { height: 0px;   } to { height: 120px; } }
+@include keyframes(slideOut) { from { height: 120px; } to { height: 0px;   } }
+
+$slideDuration: 0.05s;
 
 /*
  * Styling the top bar.
@@ -50,10 +39,11 @@ $fadeDuration: 0.08s;
     background: linear-gradient($lightColor, $primaryColor);
     margin-bottom: 2px;
     height: 65px;
+    z-index: 2;
 }
 
 a.top-bar-text {
-    margin: 0px 10px 0px 10px;
+    margin: 0px 10px;
     font-size: 36px;
     color: #fff;
 }
@@ -87,23 +77,31 @@ a.top-bar-text.secondary {
     #toggleBar {
         box-shadow: 0px 2px 0px $darkColor, 0px 2px 2px $darkColor;
         background: $primaryColor;
-        position: relative;
-        margin-top: 14px;
-        display: none;
+        position: absolute;
         width: 100%;
+        height: 0px;
         z-index: 1;
+        left: 0px;
+        top: 65px;
+
+        & *           { display: none; }
+        &.toggle-on * { display: block; }
 
         &.toggle-on {
-            display: block;
+            @include animation('slideIn #{$slideDuration} ease-in 1 forwards');
+            height: auto;
         }
 
-        &.toggle-off { }
+        &.toggle-off {
+            @include animation('slideOut #{$slideDuration} ease-in 1 forwards');
+            height: 120px;
+        }
     }
 
     a.top-bar-text.secondary {
         box-shadow: 0px 1px 0px $darkColor;
+        width: calc(100% - 20px);
         display: block;
-        width: 100%;
     }
 }
 
