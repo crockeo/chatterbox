@@ -114,23 +114,15 @@ var Chat = React.createClass({
 var User = React.createClass({
     // Rendering this user.
     render: function () {
-        var userURL = '/profile.html?username=' + this.props.user.username;
-
         return (
-            <tr>
-                <td>
-                    <a href={userURL}>
-                        <img src={'/static/img/profiles/' + this.props.user.picture}
-                             className="user-list-picture" />
-                    </a>
-                </td>
+            <div className="user-list-row">
+                <a href={'/profile.html?username=' + this.props.user.username}>
+                    <img src={'/static/img/profiles/' + this.props.user.picture}
+                         className="user-list-picture" />
 
-                <td className="user-list-row">
-                    <a href={userURL}>
-                        <span className="text-center user-list-username">{this.props.user.username}</span>
-                    </a>
-                </td>
-            </tr>
+                    <span className="text-center user-list-username">{this.props.user.username}</span>
+                </a>
+            </div>
         );
     }
 });
@@ -155,11 +147,7 @@ var UserList = React.createClass({
 
             return (
                 <div className="user-list">
-                    <table className="table table-striped">
-                        <tbody>
-                            {users}
-                        </tbody>
-                    </table>
+                    {users}
                 </div>
             );
         }

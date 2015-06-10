@@ -98,7 +98,10 @@
  * Styling the user list portion of the app.
  */
 .user-list-row {
+    box-shadow: 0px 1px #333;
     line-height: 30px;
+    margin: 0px 8px;
+    padding: 6px;
 }
 
 .user-list-picture {
