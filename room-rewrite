@@ -1,0 +1,53 @@
+I want to rewrite the socket manager to better handle sockets and allow for
+different chat rooms.
+
+---
+
+Better Handle Sockets--
+  This, to me means something along the lines of allowing socket.io to do more
+  of its own work. Right now I'm manually keeping track of a bunch of different
+  sockets in the socket list and manually iterating over all of them.
+
+  Instead I can rely on some socket.io functionality that'll probably make it
+  easier to write other expansions on the socket system later down the road.
+
+  * Rooms
+      socket.io has the ability to make sockets join / leave different rooms.
+      Instead of managing a bunch of different sockets in a bunch of different
+      places I could just as easily offload that to the library itself.
+
+---
+
+Multiple Chat Rooms--
+  This part is a bit more complicated, in that there are a number of different
+  steps to do with authentication before the socket stuff. That being said, it
+  boils down to:
+
+  Upon a channel join request:
+
+  * Check that there is a chat room with the requested name.
+  * Check that the user is authenticated to join.
+  * Have a socket join whatever room it wanted to join.
+
+  * Does it exist?
+      There should be some database schema around chat rooms. Namely:
+
+      * Title
+      * Invite mode (open | username & password | invite-only)
+
+  * Authentication.
+      ONLY DO THIS IF IT'S USERNAME & PASSWORD or INVITE-ONLY
+
+      First things first, verify the auth information - but that's a thing
+      that's already implemented. Another schema to a represent user in a given
+      chat:
+
+      * Chat title
+      * Username
+
+      After you've verified the existence of the chat, you search for any of
+      these that exist with the matching chat name & username. If one exists
+      then just add them to the chat. If it doesn't then, either reject them or
+      if it's username & password, prompt them for username & password.
+
+  * Add them to whatever room name.
