@@ -6,10 +6,12 @@
 
 /////////////
 // Imports //
-var cookieParser = require('cookie-parser'),
-    bodyParser   = require('body-parser'),
-    express      = require('express'),
-    fs           = require('fs');
+var cookieParser  = require('cookie-parser'),
+    bodyParser    = require('body-parser'),
+    express       = require('express'),
+    fs            = require('fs'),
+
+    foldermodules = require('./foldermodules');
 
 //////////
 // Code //
@@ -21,29 +23,24 @@ var app = express();
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// registerEndpoint registers a whole module that can contain a set of HTTP
-// methods for a single endpoint.
-function registerEndpoint(module) {
-  // If no path is specified, one cannot automatically register a module.
-  if (module.path === undefined)
-    return false;
-
-  // Attempting to register all of the methods.
-  var methods = ['options', 'get', 'head', 'post', 'put', 'delete', 'trace', 'connect'];
-  for (var i = 0; i < methods.length; i++)
-    if (module[methods[i]] !== undefined)
-      app[methods[i]](module.path, module[methods[i]]);
-}
-
 // initFromDir scans a given directory (specified by the argument) and attempts
 // to register every file in that directory using the 'registerEndpoint'
 // function.
 function initFromDir(path) {
-  var files = fs.readdirSync(__dirname + '/' + path);
-  for (var i = 0; i < files.length; i++) {
-    var module = require('./' + path + '/' + files[i]);
-    registerEndpoint(module);
-  }
+    var methods = ['options', 'get', 'head', 'post', 'put', 'delete', 'trace', 'connect'];
+    var fns = {};
+    for (var i = 0; i < methods.length; i++) {
+        fns[methods[i]] = (function (module) {
+            var name = methods[i];
+
+            return function (module) { app[name](module.path, module[name]); };
+        })();
+    }
+
+    foldermodules.importFolder({
+        path: path,
+        fns: fns
+    });
 }
 
 // init scans the 'api' directory for every single Javascript file and attempts
