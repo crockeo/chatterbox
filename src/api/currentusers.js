@@ -6,15 +6,16 @@
 
 /////////////
 // Imports //
-var socketmanager = require('../socketmanager.js');
+var socketmanager = require('../sockets/manager.js');
 
 //////////
 // Code //
 
 // Handling a GET request on this module's path.
 function get(req, res) {
-    var users = socketmanager.getCurrentUsers();
-    res.json(users);
+    socketmanager.getCurrentUsers(function (users) {
+        res.json(users);
+    });
 }
 
 /////////////

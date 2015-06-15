@@ -15,16 +15,21 @@ var fs = require('fs');
 
 // Importing a specified module.
 function importModule(module, config) {
-    for (var key in module)
-        if (module.hasOwnProperty(key) && typeof config.fns[key] !== 'undefined')
-            config.fns[key](module);
+    if (typeof config.required !== 'undefined')
+        for (var i = 0; i < config.required.length; i++)
+            if (typeof module[config.required[i]] === 'undefined')
+                throw new Error('Module does not have a required value: ' + config.required[i]);
+
+    config.fn(module);
 }
 
 // Importing a whole folder given some configuration. Performed synchronously
 // so that modules are imported before server starts.
+//
+// The configuration has 
 function importFolder(config) {
-    if (typeof config === 'undefined' || typeof config.path === 'undefined')
-        throw new Error('No configuration specified.');
+    if (typeof config === 'undefined' || typeof config.path === 'undefined' || typeof config.fn === 'undefined')
+        throw new Error('Invalid configuration.');
 
     if (config.path[0] !== '/')
         config.path = '/' + config.path;

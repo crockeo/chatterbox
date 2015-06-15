@@ -69,10 +69,11 @@ var ChatBox = React.createClass({
             catch (e) { auth = {};               }
 
             socket.emit('message', {
+                channel : 'main',
                 username: auth.username,
-                auth: auth.auth,
-                text: chatInput.value,
-                time: new Date()
+                auth    : auth.auth,
+                text    : chatInput.value,
+                time    : new Date()
             });
 
             chatInput.value = '';

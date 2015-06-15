@@ -12,7 +12,7 @@ var io      = require('socket.io'),
     http    = require('http');
     fs      = require('fs'),
 
-    socketManager = require('./socketmanager.js'),
+    socketmanager = require('./sockets/manager.js'),
     database      = require('./database.js'),
     api           = require('./api.js');
 
@@ -67,9 +67,7 @@ app.use(function (req, res, next) {
 var realHttp = http.Server(app),
     realIo   = io(realHttp);
 
-realIo.on('connection', function (socket) {
-    socketManager.initSocket(socket);
-});
+socketmanager.initIO(realIo);
 
 // Serving the content.
 realHttp.listen(port, function () {

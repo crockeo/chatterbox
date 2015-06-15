@@ -1,4 +1,4 @@
-// Name  : socketmanager.js
+// Name  : manager.js
 // Author: Cerek Hillen
 //
 // Description:
@@ -6,16 +6,12 @@
 
 /////////////
 // Imports //
-var common = require('./common.js');
+var foldermodules = require('../foldermodules.js'),
+    common        = require('../common.js'),
+    helper        = require('./helper.js');
 
 //////////
 // Code //
-
-// The object of sockets that are currently connected.
-var sockets = [];
-
-// The set of validated authorizations.
-var validated = {};
 
 // The function to remove a socket from the set of sockets.
 function removeSocket(socket) {
@@ -113,21 +109,44 @@ function initSocket(socket) {
     });
 }
 
-// Returning a list of users that currently exist in the socket manager.
-function getCurrentUsers() {
-    var users = [];
-    for (var key in validated) {
-        if (validated.hasOwnProperty(key)) {
-            users.push({
-                username: validated[key].username,
-                picture: validated[key].picture
-            });
+// Initializing a socket.
+function initSocket(socket) {
+    foldermodules.importFolder({
+        path: 'sockets/methods',
+
+        fn: function (module) {
+            for (var key in module)
+                if (module.hasOwnProperty(key))
+                    socket.on(key, module[key](socket));
         }
-    }
-    return users;
+    });
+}
+
+// Initializing socket.io.
+function initIO(io) {
+    var keys      = [];
+    var listeners = {};
+    foldermodules.importFolder({
+        path: 'sockets/methods',
+
+        fn: function (module) {
+            for (var key in module) {
+                if (module.hasOwnProperty(key)) {
+                    keys.push(key);
+                    listeners[key] = module[key];
+                }
+            }
+        }
+    });
+
+    io.on('connect', function (socket) {
+        for (var i = 0; i < keys.length; i++)
+            socket.on(keys[i], listeners[keys[i]](io, socket));
+    });
 }
 
 /////////////
 // Exports //
+module.exports.getCurrentUsers = helper.getCurrentUsers;
 module.exports.initSocket      = initSocket;
-module.exports.getCurrentUsers = getCurrentUsers;
+module.exports.initIO          = initIO;

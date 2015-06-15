@@ -28,18 +28,14 @@ app.use(cookieParser());
 // function.
 function initFromDir(path) {
     var methods = ['options', 'get', 'head', 'post', 'put', 'delete', 'trace', 'connect'];
-    var fns = {};
-    for (var i = 0; i < methods.length; i++) {
-        fns[methods[i]] = (function (module) {
-            var name = methods[i];
-
-            return function (module) { app[name](module.path, module[name]); };
-        })();
-    }
-
     foldermodules.importFolder({
         path: path,
-        fns: fns
+
+        fn: function (module) {
+            for (var i = 0; i < methods.length; i++)
+                if (typeof module[methods[i]] !== 'undefined')
+                    app[methods[i]](module.path, module[methods[i]]);
+        }
     });
 }
 
