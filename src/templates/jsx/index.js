@@ -155,6 +155,68 @@ var UserList = React.createClass({
     }
 });
 
+// A single tab of the chat application.
+var ChatTab = React.createClass({
+    componentDidMount: function () {
+        socket.emit('join', this.props.channel);
+    },
+
+    componentDidUnmount: function () {
+        socket.emit('leave', this.props.channel);
+    },
+
+    // Rendering the chat.
+    render: function () {
+        return (
+            <div className="max-height">
+                <div id="leftPane" className="col-xs-12 col-sm-8 col-md-8 col-lg-10">
+                    <Chat connected={this.props.connected}
+                          messages={this.props.messages} />
+                </div>
+
+                <div id="rightPane" className="col-xs-12 col-sm-4 col-md-4 col-lg-2">
+                    <UserList connected={this.props.connected}
+                              users={this.props.users} />
+                </div>
+            </div>
+        );
+    }
+});
+
+var TabList = React.createClass({
+    TabElement: React.createClass({
+        render: function () {
+            return (
+                <span className="tab-element" onClick={this.props.select}>
+                    <span className="tab-element-name">{this.props.name}</span>
+                    <span className="tab-element-close" onClick={this.props.close}>X</span>
+                </span>
+            )
+        }
+    }),
+
+    makeElem: function (index) {
+        return (
+            <this.TabElement name={this.props.tabs[index]}
+                             select={this.props.select}
+                             close={this.props.close}
+                             key={index} />
+        );
+    },
+
+    render: function () {
+        var elems = [];
+        for (var i = 0; i < this.props.tabs.length; i++)
+            elems.push(this.makeElem(i));
+
+        return (
+            <div className="tab-list">
+                {elems}
+            </div>
+        );
+    }
+});
+
 // A parent app that wraps around the chat and user list.
 var ChatApp = React.createClass({
     // Getting the initial state and defining the schema for the rest of the
@@ -162,8 +224,9 @@ var ChatApp = React.createClass({
     getInitialState: function() {
         return {
             connected: true,
-            messages: [],
-            users: null
+            channel: 'main',
+            messages: { },
+            users: { }
         };
     },
 
@@ -214,7 +277,11 @@ var ChatApp = React.createClass({
     // Adding a new message to the list of messages.
     newMessage: function (message) {
         var tmp = this.state.messages;
-        tmp.push(message);
+        if (tmp[message.channel] === undefined)
+            tmp[message.channel] = [message];
+        else
+            tmp[message.channel].push(message);
+
         this.setState({ messages: tmp });
     },
 
@@ -247,15 +314,14 @@ var ChatApp = React.createClass({
     render: function () {
         return (
             <div className="max-height">
-                <div id="leftPane" className="col-xs-12 col-sm-8 col-md-8 col-lg-10">
-                    <Chat connected={this.state.connected}
-                          messages={this.state.messages} />
-                </div>
+                <TabList select={function () { }}
+                         close={function () { }}
+                         tabs={['system', 'main', 'super private shit lol']} />
 
-                <div id="rightPane" className="col-xs-12 col-sm-4 col-md-4 col-lg-2">
-                    <UserList connected={this.state.connected}
-                              users={this.state.users} />
-                </div>
+                <ChatTab messages={this.state.messages[this.state.channel] ? this.state.messages[this.state.channel] : []}
+                         users={this.state.users[this.state.channel] ? this.state.users[this.state.channel] : []}
+                         connected={this.state.connected}
+                         channel={this.state.channel} />
             </div>
         );
     }

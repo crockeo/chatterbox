@@ -16,10 +16,7 @@ var common = require('../../common.js'),
 function register(io, socket) {
     return function (cookie) {
         common.isLogged(cookie, function (err, logged, userinfo) {
-            socket.emit('message', helper.serverMessage({
-                channel: 'system',
-                text   : 'Connected to the server.'
-            }));
+            socket.emit('message', helper.serverMessage('Connected to the server.'));
 
             if (!err && logged) {
                 var jCookie;
@@ -38,10 +35,7 @@ function register(io, socket) {
                     picture : userinfo.picture
                 });
 
-                socket.emit('message', helper.serverMessage({
-                    channel: 'system',
-                    text   : 'Logged in to the server.'
-                }));
+                socket.emit('message', helper.serverMessage('Logged in to the server.'));
             }
 
             socket.join('main');

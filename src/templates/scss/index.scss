@@ -4,7 +4,7 @@
  * Styling the left and right panes specifically.
  */
 #chatApp {
-    height: calc(100% - 67px);
+    height: calc(100% - 113px);
     padding: 0px;
     margin: 0px;
 }
@@ -134,4 +134,40 @@
 
 .user {
     margin: 1px;
+}
+
+/*
+ * Styling the chat tab portion of the app.
+ */
+.tab-element {
+    box-shadow: 2px 0px 0px $primaryColor, -2px 0px 0px $primaryColor;
+    background: $lightColor;
+    padding: 14px 24px;
+    margin: 0px 1px;
+    color: #fff;
+
+    &.selected {
+        background: lighten($lightColor, 6%);
+    }
+}
+
+.tab-element-name {
+
+}
+
+.tab-element-close {
+    margin-left: 16px;
+    font-size: 16px;
+
+    &:hover {
+        cursor: pointer;
+        color: #eee;
+    }
+}
+
+.tab-list {
+    box-shadow: 0px 2px 0px $darkColor;
+    padding: 10px 0px 11px 0px;
+    background: $lighterColor;
+    margin-bottom: 2px;
 }
