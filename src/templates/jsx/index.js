@@ -187,12 +187,13 @@ var ChatTab = React.createClass({
 var TabList = React.createClass({
     // Rendering a specific tab element.
     TabElement: React.createClass({
+        // Rendering the current TabElement.
         render: function () {
             var c = this.props.selected ? 'tab-element selected' : 'tab-element';
             return (
-                <span className={c} onClick={this.props.select}>
+                <span className={c} onClick={this.props.select(this.props.name)}>
                     <span className="tab-element-name">{this.props.name}</span>
-                    <span className="tab-element-close" onClick={this.props.close}>X</span>
+                    <span className="tab-element-close" onClick={this.props.close(this.props.name)}>X</span>
                 </span>
             )
         }
@@ -321,14 +322,24 @@ var ChatApp = React.createClass({
         }
     },
 
+    // Changing the current tab.
+    selectTab: function (name) {
+        return function () { this.setState({ channel: name }); }.bind(this);
+    },
+
+    // Removing a given tab.
+    closeTab: function (name) {
+
+    },
+
     // Rendering the whole app.
     render: function () {
         return (
             <div className="max-height">
-                <TabList select={function () { }}
+                <TabList currentTab={this.state.channel}
+                         select={this.selectTab}
                          close={function () { }}
-                         tabs={['system', 'main', 'super private shit lol']}
-                         currentTab={'system'} />
+                         tabs={['system', 'main', 'super private shit lol']} />
 
                 <ChatTab messages={this.state.messages[this.state.channel] ? this.state.messages[this.state.channel] : []}
                          users={this.state.users[this.state.channel] ? this.state.users[this.state.channel] : []}
