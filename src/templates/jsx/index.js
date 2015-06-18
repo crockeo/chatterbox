@@ -183,11 +183,14 @@ var ChatTab = React.createClass({
     }
 });
 
+// The bar atop the chat messages that lists currently open tabs.
 var TabList = React.createClass({
+    // Rendering a specific tab element.
     TabElement: React.createClass({
         render: function () {
+            var c = this.props.selected ? 'tab-element selected' : 'tab-element';
             return (
-                <span className="tab-element" onClick={this.props.select}>
+                <span className={c} onClick={this.props.select}>
                     <span className="tab-element-name">{this.props.name}</span>
                     <span className="tab-element-close" onClick={this.props.close}>X</span>
                 </span>
@@ -195,13 +198,19 @@ var TabList = React.createClass({
         }
     }),
 
+    // Rendering a single TabElement of the TabList.
     makeElem: function (index) {
         return (
-            <this.TabElement name={this.props.tabs[index]}
+            <this.TabElement selected={this.props.tabs[index] === this.props.currentTab}
+                             name={this.props.tabs[index]}
                              select={this.props.select}
                              close={this.props.close}
                              key={index} />
         );
+    },
+
+    addNewTab: function () {
+
     },
 
     render: function () {
@@ -212,6 +221,8 @@ var TabList = React.createClass({
         return (
             <div className="tab-list">
                 {elems}
+
+                <span className="tab-add" onClick={this.addNewTab}>+</span>
             </div>
         );
     }
@@ -316,7 +327,8 @@ var ChatApp = React.createClass({
             <div className="max-height">
                 <TabList select={function () { }}
                          close={function () { }}
-                         tabs={['system', 'main', 'super private shit lol']} />
+                         tabs={['system', 'main', 'super private shit lol']}
+                         currentTab={'system'} />
 
                 <ChatTab messages={this.state.messages[this.state.channel] ? this.state.messages[this.state.channel] : []}
                          users={this.state.users[this.state.channel] ? this.state.users[this.state.channel] : []}
