@@ -10,7 +10,7 @@
 // Constructing a message from the server.
 function serverMessage(message) {
     return {
-        channel : 'main',
+        channel : 'system',
         username: 'System',
         picture : 'system.png',
         text    : message,

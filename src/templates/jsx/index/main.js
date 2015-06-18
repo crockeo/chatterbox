@@ -35,9 +35,8 @@ withGlobal(function (global) {
         // application.
         getInitialState: function() {
             return {
+                channel: 'system',
                 connected: true,
-                channel: 'main',
-                tabs: ['main'],
                 messages: { },
                 users: { }
             };
@@ -150,11 +149,9 @@ withGlobal(function (global) {
         render: function () {
             return (
                 <div className="max-height">
-                    <TabList currentTab={this.state.channel}
-                             selectTab={this.selectTab}
-                             closeTab={this.closeTab}
-                             tabs={this.state.tabs}
-                             addTab={this.addTab} />
+                    <TabList setChannel={function (channel) { this.setState({ channel: channel }) }.bind(this)}
+                             currentTab={this.state.channel}
+                             socket={this.state.socket} />
 
                     <ChatTab messages={this.state.messages[this.state.channel] ? this.state.messages[this.state.channel] : []}
                              users={this.state.users[this.state.channel] ? this.state.users[this.state.channel] : []}

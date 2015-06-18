@@ -142,7 +142,7 @@
 .tab-element {
     box-shadow: 2px 0px 0px $primaryColor, -2px 0px 0px $primaryColor;
     background: $lightColor;
-    padding: 14px 24px;
+    padding: 13px 24px;
     margin: 0px 1px;
     color: #fff;
 
@@ -151,12 +151,13 @@
     }
 }
 
-.tab-element-name { }
+.tab-element-name {
+    font-weight: bold;
+}
 
 .tab-element-close {
     font-weight: bold;
     margin-left: 16px;
-    font-size: 16px;
 
     &:hover {
         cursor: pointer;
@@ -166,15 +167,15 @@
 
 .tab-list {
     box-shadow: 0px 2px 0px $darkColor;
-    padding: 10px 0px 11px 0px;
+    padding: 11px 0px 11px 0px;
     background: $lighterColor;
     margin-bottom: 2px;
 }
 
 .tab-add {
     box-shadow: 1px 0px 0px $lightColor, 1px 0px 1px $lightColor;
-    border-radius: 0px 12px 12px 0px;
-    padding: 14px 16px;
+    border-radius: 0px 10px 10px 0px;
+    padding: 13px 16px;
     font-weight: bold;
 
     &:hover {
