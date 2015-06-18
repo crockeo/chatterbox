@@ -11,6 +11,13 @@
 // The global time that redirects should take to start (in milliseconds).
 GLOBAL_REDIRECT_TIME = 100;
 
+// Performing some callback with a global context.
+function withGlobal(callback) {
+    if (typeof callback !== 'function')
+        throw new Error('');
+    callback(typeof window === 'undefined' ? this : window);
+}
+
 // Making an AJAX request to a given URL.
 function makeRequest(config) {
     var req = new XMLHttpRequest();
@@ -30,7 +37,7 @@ function makeRequest(config) {
 }
 
 // Checking whether or not a user is logged in.
-(function (global) {
+withGlobal(function (global) {
     var checkedCookie = null;
     var logged = null;
 
@@ -63,7 +70,7 @@ function makeRequest(config) {
             }
         });
     };
-})(typeof window === undefined ? this : window);
+});
 
 // Responding to a standard form submit. Meant to be .bind()-ed with the calling
 // React class.
@@ -85,7 +92,7 @@ function handleFormSubmit(response) {
 }
 
 // Getting a given query parameter from the URL.
-(function (global) {
+withGlobal(function (global) {
     var cache = {};
 
     global.getQueryParam = function(name) {
@@ -103,7 +110,7 @@ function handleFormSubmit(response) {
 
         return cache[name];
     };
-})(typeof window === undefined ? this : window);
+});
 
 // Code to add or remove a CSS class from a given element.
 function addClass(element, classToAdd) {
