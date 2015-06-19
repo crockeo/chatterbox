@@ -7,7 +7,8 @@
 /////////////
 // Imports //
 var common = require('../../common.js'),
-    helper = require('../helper.js');
+    helper = require('../helper.js'),
+    join   = require('./join.js');
 
 //////////
 // Code //
@@ -30,11 +31,7 @@ function register(io, socket) {
                     auth    : jCookie.auth
                 });
 
-                io.emit('userconnect', {
-                    username: userinfo.username,
-                    picture : userinfo.picture
-                });
-
+                join.join(io, socket)('main');
                 socket.emit('message', helper.serverMessage('Logged in to the server.'));
             }
 

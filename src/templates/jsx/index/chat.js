@@ -67,7 +67,7 @@ withGlobal(function (global) {
                 catch (e) { auth = {};               }
 
                 this.props.socket.emit('message', {
-                    channel : 'main',
+                    channel : this.props.channel,
                     username: auth.username,
                     auth    : auth.auth,
                     text    : chatInput.value,
@@ -104,6 +104,7 @@ withGlobal(function (global) {
                 <div className="max-height">
                     <Messages messages={this.props.messages} />
                     <ChatBox connected={this.props.connected}
+                             channel={this.props.channel}
                              socket={this.props.socket} />
                 </div>
             );

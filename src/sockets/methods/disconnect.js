@@ -16,7 +16,13 @@ function disconnect(io, socket) {
     return function () {
         var validation = helper.getValidation(socket.id);
         if (validation !== undefined) {
-            io.emit('userdisconnect', validation.username);
+            for (var i = 0; i < validation.channels.length; i++) {
+                io.emit('userdisconnect', {
+                    username: validation.username,
+                    channel : validation.channels[i]
+                });
+            }
+
             helper.removeValidation(socket.id);
         }
     }

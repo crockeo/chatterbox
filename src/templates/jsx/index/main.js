@@ -17,6 +17,7 @@ withGlobal(function (global) {
                     <div id="leftPane" className="col-xs-12 col-sm-8 col-md-8 col-lg-10">
                         <Chat connected={this.props.connected}
                               messages={this.props.messages}
+                              channel={this.props.channel}
                               socket={this.props.socket} />
                     </div>
 
@@ -66,10 +67,25 @@ withGlobal(function (global) {
                     },
 
                     onload: function (response) {
-                        var users;
+                        var userList;
 
-                        try       { users = JSON.parse(response);                    }
+                        try       { userList = JSON.parse(response);                 }
                         catch (e) { console.log('Could not get user list.'); return; }
+
+                        var users = {};
+                        for (var i = 0; i < userList.length; i++) {
+                            for (var j = 0; j < userList[i].channels.length; j++) {
+                                var v = {
+                                    username: userList[i].username,
+                                    picture : userList[i].picture
+                                };
+
+                                if (users[userList[i].channels[j]] === undefined)
+                                    users[userList[i].channels[j]] = [v];
+                                else
+                                    users[userList[i].channels[j]].push(v);
+                            }
+                        }
 
                         this.setState({
                             connected: true,
@@ -100,49 +116,36 @@ withGlobal(function (global) {
         },
 
         // Removing a user from the set of users when they connect.
-        userConnect: function (username) {
-            if (this.state.users !== null) {
-                var tmp = this.state.users;
-                tmp.push(username);
+        userConnect: function (data) {
+            var tmp = this.state.users;
+            if (this.state.users[data.channel] === undefined)
+                tmp[data.channel] = [data.user];
+            else
+                tmp[data.channel].push(data.user);
 
-                this.setState({ users: tmp });
-            }
+            this.setState({ users: tmp });
         },
 
         // Removing a user from the set of users when they disconnect.
-        userDisconnect: function (username) {
-            if (this.state.users !== null) {
-                var tmp = this.state.users;
-                for (var i = 0; i < tmp.length; i++) {
-                    if (username === tmp[i].username) {
-                        tmp.splice(i, 1);
+        userDisconnect: function (data) {
+            if (this.state.users[data.channel] !== undefined) {
+                var idx = 0;
+                for (idx = 0; idx <= this.state.users[data.channel].length; idx++) {
+                    if (idx == this.state.users[data.channel].length) {
+                        idx = -1;
                         break;
                     }
+
+                    if (data.username === this.state.users[data.channel][idx].username)
+                        break;
                 }
 
-                this.setState({ users: tmp });
+                if (idx !== -1) {
+                    var tmp = this.state.users;
+                    tmp[data.channel].splice(idx, 1);
+                    this.setState({ users: tmp });
+                }
             }
-        },
-
-        // Adding a new tab to the list of tabs.
-        addTab: function (name) {
-            if (this.state.tabs.find(name) === -1) {
-                var tmp = this.state.tabs;
-                tmp.push(name);
-                this.setState({
-                    tabs: tmp
-                });
-            }
-        },
-
-        // Changing the current tab.
-        selectTab: function (name) {
-            return function () { this.setState({ channel: name }); }.bind(this);
-        },
-
-        // Removing a given tab.
-        closeTab: function (name) {
-
         },
 
         // Rendering the whole app.
@@ -151,7 +154,7 @@ withGlobal(function (global) {
                 <div className="max-height">
                     <TabList setChannel={function (channel) { this.setState({ channel: channel }) }.bind(this)}
                              currentTab={this.state.channel}
-                             socket={this.state.socket} />
+                             socket={this.props.socket} />
 
                     <ChatTab messages={this.state.messages[this.state.channel] ? this.state.messages[this.state.channel] : []}
                              users={this.state.users[this.state.channel] ? this.state.users[this.state.channel] : []}

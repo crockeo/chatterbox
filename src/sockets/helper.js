@@ -25,13 +25,25 @@ function serverMessage(message) {
 var validated = {};
 
 // Cacheing a validation of a given socket (and its associated authentication).
-function addValidation(id, validation) { validated[id] = validation; }
+function addValidation(id, validation) {
+    validation.channels = [];
+    validated[id] = validation;
+}
 
 // Deleting a validation from the set of validated socket ids.
 function removeValidation(id) { validated[id] = undefined; }
 
 // Accessing the cached validation (if it exists).
 function getValidation(id) { return validated[id]; }
+
+// Joining or leaving a channel in the validation.
+function joinChannel(id, name) { validated[id].channels.push(name); }
+
+function leaveChannel(id, name) {
+    var idx = validated[id].channels.indexOf(name);
+    if (idx != -1)
+        validated[id].channels.splice(idx, 1);
+}
 
 // Getting the set of users currently connected & validated by the server.
 function getCurrentUsers(callback) {
@@ -44,6 +56,7 @@ function getCurrentUsers(callback) {
             if (validated.hasOwnProperty(key) && validated[key] !== undefined) {
                 users.push({
                     username: validated[key].username,
+                    channels: validated[key].channels,
                     picture : validated[key].picture
                 });
             }
@@ -59,4 +72,6 @@ module.exports.serverMessage    = serverMessage;
 module.exports.addValidation    = addValidation;
 module.exports.removeValidation = removeValidation;
 module.exports.getValidation    = getValidation;
+module.exports.joinChannel      = joinChannel;
+module.exports.leaveChannel     = leaveChannel;
 module.exports.getCurrentUsers  = getCurrentUsers;
