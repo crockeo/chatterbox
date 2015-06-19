@@ -31,11 +31,45 @@ withGlobal(function (global) {
         }
     });
 
+    // The form for trying to join a new channel.
+    var NewTabForm = React.createClass({
+        // Submitting the new tab name.
+        onSubmit: function (e) {
+            e.preventDefault();
+
+            var input = this.refs.tab.getDOMNode();
+            this.props.addTab(input.value);
+            input.value = '';
+        },
+
+        // Getting whether or not a given thing should be expanding in this app.
+        getExpandState: function(name) {
+            if (this.props.expanding)
+                return name + ' expanding';
+            else if (this.props.hiding)
+                return name + ' hiding';
+            return name;
+        },
+
+        // Rendering the chat form.
+        render: function () {
+            return (
+                <form onSubmit={this.onSubmit} className={this.getExpandState('tab-add-form')}>
+                    <input ref="tab" className={this.getExpandState('tab-add-input')} type="text" placeholer="Enter tab name." />
+                </form>
+            );
+        }
+    });
+
     // The bar atop the chat messages that lists currently open tabs.
     var TabList = React.createClass({
         // Defining the schema of the TabList state along w/ default tabs.
         getInitialState: function () {
-            return { tabs: ['system', 'main'] };
+            return {
+                expandingNewTabForm: false,
+                tabs: ['system', 'main'],
+                hidingNewTabForm: false
+            };
         },
 
         // Selecting a new tab.
@@ -66,14 +100,35 @@ withGlobal(function (global) {
         },
 
         // Adding a new tab to the list of tabs.
-        addTab: function (name) {
-            return function () {
-                var tmp = this.state.tabs;
-                tmp.push(name);
-                this.setState({ tabs: tmp });
+        toggleAddTab: function () {
+            if (this.state.expandingNewTabForm) {
+                this.setState({
+                    expandingNewTabForm: false,
+                    hidingNewTabForm: true
+                });
 
-                this.props.socket.emit('join', name);
-            }.bind(this);
+                // When you change the animation time in the CSS make sure
+                // to change the duration of the timeout right here. Or else
+                // there'll be a mismatch w/ the CSS animation and the
+                // Javascript activity.
+                setTimeout(function () {
+                    this.setState({
+                        hidingNewTabForm: false
+                    })
+                }.bind(this), 400);
+            } else {
+                this.setState({
+                    expandingNewTabForm: true
+                });
+            }
+        },
+
+        // Adding a new tab to the list of tabs that exist.
+        addTab: function (name) {
+            this.props.socket.emit('join', name);
+            var tmp = this.state.tabs;
+            tmp.push(name);
+            this.setState({ tabs: tmp });
         },
 
         // Rendering a single TabElement of the TabList.
@@ -97,7 +152,11 @@ withGlobal(function (global) {
                 <div className="tab-list">
                     {elems}
 
-                    <span className="tab-add" onClick={this.addTab('testing')}>+</span>
+                    <NewTabForm expanding={this.state.expandingNewTabForm}
+                                hiding={this.state.hidingNewTabForm}
+                                addTab={this.addTab} />
+
+                    <span className="tab-add" onClick={this.toggleAddTab}>+</span>
                 </div>
             );
         }
