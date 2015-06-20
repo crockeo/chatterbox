@@ -174,7 +174,7 @@
 }
 
 /* .tab-add-form */
-$slideDuration: 0.4s;
+$slideDuration: 0.25s;
 $formWidth: 160px;
 
 @include keyframes(expandLeft) { from { width: 0px;        } to { width: $formWidth; } }

@@ -38,8 +38,8 @@ withGlobal(function (global) {
             e.preventDefault();
 
             var input = this.refs.tab.getDOMNode();
-            this.props.addTab(input.value);
-            input.value = '';
+            if (this.props.addTab(input.value))
+                input.value = '';
         },
 
         // Getting whether or not a given thing should be expanding in this app.
@@ -115,7 +115,7 @@ withGlobal(function (global) {
                     this.setState({
                         hidingNewTabForm: false
                     })
-                }.bind(this), 400);
+                }.bind(this), 250);
             } else {
                 this.setState({
                     expandingNewTabForm: true
@@ -125,10 +125,15 @@ withGlobal(function (global) {
 
         // Adding a new tab to the list of tabs that exist.
         addTab: function (name) {
+            if (this.state.tabs.indexOf(name) !== -1 || name == '')
+                return false;
+
             this.props.socket.emit('join', name);
             var tmp = this.state.tabs;
             tmp.push(name);
             this.setState({ tabs: tmp });
+
+            return true;
         },
 
         // Rendering a single TabElement of the TabList.
