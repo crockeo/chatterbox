@@ -14,11 +14,11 @@ var helper = require('../helper.js');
 // A socket attempting to join a new channel.
 function join(io, socket) {
     return function (channel) {
-        helper.joinChannel(socket.id, channel);
         socket.join(channel);
 
         var v = helper.getValidation(socket.id);
         if (v !== undefined) {
+            helper.joinChannel(socket.id, channel);
             io.to(channel).emit('userconnect', {
                 channel : channel,
                 user    : {

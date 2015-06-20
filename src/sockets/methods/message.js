@@ -16,7 +16,10 @@ function message(io, socket) {
     return function (msg) {
         var validation = helper.getValidation(socket.id);
         if (!msg.auth || validation === undefined) {
-            socket.emit('message', helper.serverMessage('You must be logged in to send chat messages.'));
+            var serverMsg = helper.serverMessage('You must be logged in to send chat messages.');
+            serverMsg.channel = msg.channel;
+            socket.emit('message', serverMsg);
+
             return;
         }
 
