@@ -143,13 +143,22 @@
 .tab-element {
     box-shadow: 2px 0px 0px $primaryColor, -2px 0px 0px $primaryColor;
     background: $lightColor;
-    padding: 13px 24px;
+    padding: 13px 14px;
     margin: 0px 1px;
     color: #fff;
 
     &.selected {
         background: lighten($lightColor, 6%);
     }
+}
+
+.tab-element-settings {
+    margin-right: 16px;
+    color: #fff;
+
+    &:visited { color: #fff; }
+    &:active  { color: #fff; }
+    &:hover   { color: #ddd; }
 }
 
 .tab-element-name {

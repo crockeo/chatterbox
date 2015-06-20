@@ -15,9 +15,10 @@ var helper = require('../helper.js');
 function join(io, socket) {
     return function (channel) {
         socket.join(channel);
+        socket.emit('join', channel);
 
         var v = helper.getValidation(socket.id);
-        if (v !== undefined) {
+        if (v !== undefined && v.channels.indexOf(channel) === -1) {
             helper.joinChannel(socket.id, channel);
             io.to(channel).emit('userconnect', {
                 channel : channel,

@@ -24,7 +24,7 @@ withGlobal(function (global) {
                 return (
                     <span className={c} onClick={this.props.selectTab(this.props.name)}>
                         <span className="tab-element-name">{this.props.name}</span>
-                        <span className="tab-element-close" onClick={this.props.closeTab(this.props.name)}>X</span>
+                        <span className="tab-element-close glyphicon glyphicon-remove" onClick={this.props.closeTab(this.props.name)}></span>
                     </span>
                 );
             }
@@ -67,9 +67,14 @@ withGlobal(function (global) {
         getInitialState: function () {
             return {
                 expandingNewTabForm: false,
-                tabs: ['system', 'main'],
-                hidingNewTabForm: false
+                hidingNewTabForm: false,
+                tabs: ['system']
             };
+        },
+
+        // Registering on a confirmed join with the list of tabs.
+        componentDidMount: function () {
+            this.props.socket.on('join', this.realAddTab);
         },
 
         // Selecting a new tab.
@@ -123,17 +128,29 @@ withGlobal(function (global) {
             }
         },
 
+        // Validating a given tab name.
+        validateTabName: function (name) {
+            return name !== '';
+        },
+
         // Adding a new tab to the list of tabs that exist.
         addTab: function (name) {
-            if (this.state.tabs.indexOf(name) !== -1 || name == '')
+            if (!this.validateTabName(name))
                 return false;
 
             this.props.socket.emit('join', name);
+            return true;
+        },
+
+        // Actually adding a new tab to the list - after the server has
+        // confirmed that the user has joined.
+        realAddTab: function (name) {
+            if (this.state.tabs.indexOf(name) !== -1)
+                return;
+
             var tmp = this.state.tabs;
             tmp.push(name);
             this.setState({ tabs: tmp });
-
-            return true;
         },
 
         // Rendering a single TabElement of the TabList.
