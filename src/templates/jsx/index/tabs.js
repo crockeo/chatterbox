@@ -150,7 +150,9 @@ withGlobal(function (global) {
 
             var tmp = this.state.tabs;
             tmp.push(name);
-            this.setState({ tabs: tmp });
+            this.setState({
+                tabs: tmp
+            });
         },
 
         // Rendering a single TabElement of the TabList.
