@@ -75,6 +75,10 @@ withGlobal(function (global) {
         // Registering on a confirmed join with the list of tabs.
         componentDidMount: function () {
             this.props.socket.on('join', this.realAddTab);
+            checkLogged(function (logged) {
+                if (!logged)
+                    this.props.socket.emit('join', 'main');
+            }.bind(this));
         },
 
         // Selecting a new tab.
