@@ -76,8 +76,11 @@ withGlobal(function (global) {
         componentDidMount: function () {
             this.props.socket.on('join', this.realAddTab);
             checkLogged(function (logged) {
-                if (!logged)
-                    this.props.socket.emit('join', 'main');
+                if (!logged) {
+                    this.props.socket.emit('join', {
+                        name: 'main'
+                    });
+                }
             }.bind(this));
         },
 
@@ -142,7 +145,10 @@ withGlobal(function (global) {
             if (!this.validateTabName(name))
                 return false;
 
-            this.props.socket.emit('join', name);
+            this.props.socket.emit('join', {
+                name: name
+            });
+
             return true;
         },
 

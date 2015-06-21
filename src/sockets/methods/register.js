@@ -31,7 +31,10 @@ function register(io, socket) {
                     auth    : jCookie.auth
                 });
 
-                join.join(io, socket)('main');
+                join.join(io, socket)({
+                    name: 'main'
+                });
+
                 socket.emit('message', helper.serverMessage('Logged in to the server.'));
             }
 

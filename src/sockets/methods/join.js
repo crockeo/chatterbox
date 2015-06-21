@@ -38,7 +38,7 @@ function doRealJoin(io, socket, channel) {
 function join(io, socket) {
     return function (channel) {
         database.schema.Channel.find({
-            name: channel
+            name: channel.name
         }, function (err, channels) {
             if (err) {
                 socket.emit('joinerr', {
@@ -51,7 +51,7 @@ function join(io, socket) {
 
             if (channels.length === 0) {
                 new database.schema.Channel({
-                    name    : channel,
+                    name    : channel.name,
                     authType: 'open',
                     password: null
                 }).save(function (err) {
@@ -64,7 +64,7 @@ function join(io, socket) {
                         return;
                     }
 
-                    doRealJoin(io, socket, channel);
+                    doRealJoin(io, socket, channel.name);
                 });
 
                 return;
@@ -74,18 +74,43 @@ function join(io, socket) {
 
             // Automatically joining an open channel.
             if (dbChannel.authType == 'open') {
-                doRealJoin(io, socket, channel);
+                doRealJoin(io, socket, channel.name);
                 return;
             }
 
             // Requiring a password to join a password that needs a password.
             if (dbChannel.authType == 'password') {
+                if (dbChannel.password === channel.password)
+                    doRealJoin(io, socket, channel.name);
+                else {
+                    socket.emit('joinerr', {
+                        err    : null,
+                        message: 'Invalid channel password.'
+                    });
+                }
+
                 return;
             }
 
             // Requiring a user to have been invited to a channel to join an
             // invite-only channel.
             if (dbChannel.authType == 'invite') {
+                database.schema.InChannel.find({
+                    username: channel.username,
+                    chatName: channel.chatName
+                }, function (err, matches) {
+                    if (err || matches.length !== 0) {
+                        socket.emit('joinerr', {
+                            err    : null,
+                            message: 'Failed to join invite-only channel.'
+                        });
+
+                        return;
+                    }
+
+                    doRealJoin(io, socket, channel.name);
+                });
+
                 return;
             }
         });
