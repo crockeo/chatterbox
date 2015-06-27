@@ -39,6 +39,12 @@ var schema = {
     InChannel: mongoose.model('InChannel', {
         username: String,
         chatName: String
+    }),
+
+    Img: mongoose.model('Img', {
+        id         : Number,
+        contentType: String,
+        data       : Buffer
     })
 };
 

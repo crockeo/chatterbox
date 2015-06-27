@@ -20,7 +20,7 @@ var cookieParser  = require('cookie-parser'),
 var app = express();
 
 // Parsing POST requests as JSON.
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '128kb' }));
 app.use(cookieParser());
 
 // initFromDir scans a given directory (specified by the argument) and attempts

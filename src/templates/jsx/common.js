@@ -73,10 +73,8 @@ withGlobal(function (global) {
 });
 
 // Responding to a standard form submit. Meant to be .bind()-ed with the calling
-// React class.
-function handleFormSubmit(response) {
-    var json = JSON.parse(response);
-
+// React class. To be ran on a JSON object instead of serialized JSON.
+function handleFormSubmitJSON(json) {
     var errorClass;
     if (json.error)
         errorClass = 'text-danger';
@@ -90,6 +88,10 @@ function handleFormSubmit(response) {
         error: json.message
     });
 }
+
+// Responding to a standard form submit. Meant to be .bind()-ed with the calling
+// React class.
+function handleFormSubmit(response) { handleFormSubmitJSON.bind(this)(JSON.parse(response)) }
 
 // Getting a given query parameter from the URL.
 withGlobal(function (global) {

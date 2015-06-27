@@ -15,6 +15,61 @@ var ProfilePage = React.createClass({
         return { errorClass: '', error: '' };
     },
 
+    // Attempting to upload an image to the server - calling the callback
+    // function with the appropriate information.
+    uploadImage: function (image, callback) {
+        if (image.size > 1024 * 100) {
+            handleFormSubmitJSON.bind(this)({
+                error  : false,
+                success: false,
+                message: 'Max image size is 100KB.'
+            });
+
+            return;
+        }
+
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            makeRequest({
+                method: 'POST',
+                path: '/api/image',
+
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept'      : 'application/json'
+                },
+
+                body: JSON.stringify({
+                    contentType: image.type,
+                    data       : e.target.result
+                }),
+
+                onprogress: function (response) {
+                    // TODO: Manage a progress bar or something?
+                }.bind(this),
+
+                onload: function (response) {
+                    var json;
+                    try { json = JSON.parse(response); }
+                    catch (e) {
+                        handleFormSubmitJSON.bind(this)({
+                            error  : true,
+                            success: false,
+                            message: 'Failed to parse server response.'
+                        });
+
+                        return;
+                    }
+
+                    callback(json);
+                }.bind(this)
+            });
+        };
+
+        reader.readAsBinaryString(image);
+    },
+
     // Running some piece of code when the update profile form is submitted.
     onSubmit: function (e) {
         e.preventDefault();
@@ -26,46 +81,71 @@ var ProfilePage = React.createClass({
             picture    = this.refs.picture.getDOMNode(),
             password   = this.refs.password.getDOMNode();
 
-        if (npassword.value !== cnpassword.value) {
-            this.setState({
-                errorClass: 'text-warning',
-                error: 'New passwords do not match.'
+        // Making sure that you've selected a new picture.
+        if (picture.files.length !== 1) {
+            handleFormSubmitJSON.bind(this)({
+                error  : false,
+                success: false,
+                message: 'You have to select an image.'
             });
 
             return;
         }
 
-        makeRequest({
-            method: 'POST',
-            path: '/api/user',
+        // Making sure that the new passwords match.
+        if (npassword.value !== cnpassword.value) {
+            handleFormSubmitJSON.bind(this)({
+                error  : false,
+                success: false,
+                message: 'Passwords do not match.'
+            });
 
-            body: JSON.stringify({
-                auth    : Cookies.get('auth'),
-                password: password.value,
+            return;
+        }
 
-                update: {
-                    username : username.value === this.props.user.username || username.value === '' ? undefined : username.value,
-                    email    : email.value    === this.props.user.email    || email.value    === '' ? undefined : email.value,
-                    npassword: npassword.value,
-                    picture  : undefined
-                }
-            }),
+        // TODO:
+        //   The order of these operations implies that even if the 2nd request
+        //   fails, it's still going to be uploading an image. Which is kind of
+        //   not really what I want. So I guess come back here and fix it at
+        //   some point in the future.
+        this.uploadImage(picture.files[0], function (response) {
+            if (response.error || !response.success) {
+                handleFormSubmitJSON.bind(this)(response);
+                return;
+            }
 
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
+            makeRequest({
+                method: 'POST',
+                path  : '/api/user',
 
-            onload: function (response) {
-                handleFormSubmit.bind(this)(response);
+                body: JSON.stringify({
+                    auth    : Cookies.get('auth'),
+                    password: password.value,
 
-                var json = JSON.parse(response);
-                setTimeout(function () {
-                    if (json.success)
-                        window.location = '/profile.html';
-                }, GLOBAL_REDIRECT_TIME);
-            }.bind(this)
-        });
+                    update: {
+                        username : username.value === this.props.user.username || username.value === '' ? undefined : username.value,
+                        email    : email.value    === this.props.user.email    || email.value    === '' ? undefined : email.value,
+                        npassword: npassword.value,
+                        picture  : response.id
+                    }
+                }),
+
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept'      : 'application/json'
+                },
+
+                onload: function (response) {
+                    handleFormSubmit.bind(this)(response);
+
+                    var json = JSON.parse(response);
+                    setTimeout(function () {
+                        if (json.success)
+                            window.location = '/profile.html';
+                    }, GLOBAL_REDIRECT_TIME);
+                }.bind(this)
+            });
+        }.bind(this));
     },
 
     // Setting the initial values of the form.
