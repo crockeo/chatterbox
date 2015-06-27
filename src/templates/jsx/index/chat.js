@@ -16,7 +16,7 @@ withGlobal(function (global) {
             return (
                 <p className="chat-message">
                     <span className="chat-profile-container">
-                        <img src={"/static/img/profiles/" + this.props.message.picture}
+                        <img src={'/api/image?id=' + this.props.message.picture}
                              title={this.props.message.username}
                              alt={this.props.message.username}
                              className="chat-profile-picture" />

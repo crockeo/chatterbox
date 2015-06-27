@@ -16,16 +16,21 @@ var common = require('../common.js'),
 // Attempting to find a photo with a given ID on the server.
 function get(req, res) {
     common.allExists(req.query, ['id'], function (exists) {
-        if (!exists) {
-            res.status(404).send('Malformed request.');
+        if (!exists)
+            return res.status(404).send('Malformed request.');
+
+        switch (req.query.id) {
+        case 'system':
+            res.sendFile(process.cwd() + '/src/static/img/profiles/system.png');
+            return;
+        case 'default':
+            res.sendFile(process.cwd() + '/src/static/img/profiles/blank_user_profile.jpg')
             return;
         }
 
         images.get(req.query.id, function (err, img) {
-            if (err) {
-                res.status(404).send(String(err));
-                return;
-            }
+            if (err)
+                return res.status(404).send(String(err));
 
             res.set('Content-Type', img.contentType);
             res.send(img.data);

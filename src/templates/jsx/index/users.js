@@ -15,7 +15,7 @@ withGlobal(function (global) {
             return (
                 <div className="user-list-row">
                     <a href={'/profile.html?username=' + this.props.user.username}>
-                        <img src={'/static/img/profiles/' + this.props.user.picture}
+                        <img src={'/api/image?id=' + this.props.user.picture}
                              className="user-list-picture" />
 
                         <span className="text-center user-list-username">{this.props.user.username}</span>

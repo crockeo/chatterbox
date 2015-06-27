@@ -12,7 +12,7 @@ function serverMessage(message) {
     return {
         channel : 'system',
         username: 'System',
-        picture : 'system.png',
+        picture : 'system',
         text    : message,
         time    : new Date()
     };

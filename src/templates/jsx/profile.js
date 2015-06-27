@@ -213,7 +213,7 @@ var ProfilePage = React.createClass({
             <div className="max-height">
                 <div className="left-bar">
                     <span className="profile-container">
-                        <img src={'/static/img/profiles/' + this.props.user.picture}
+                        <img src={'/api/image?id=' + this.props.user.picture}
                              alt={this.props.user.profile}
                              className="profile-picture" />
 

@@ -6,7 +6,9 @@
 
 /////////////
 // Imports //
-var database = require('./database.js');
+var fs = require('fs'),
+
+    database = require('./database.js');
 
 //////////
 // Code //
@@ -31,7 +33,7 @@ function save(img, callback) {
         new database.schema.Img({
             id         : id,
             contentType: img.contentType,
-            data       : img.data
+            data       : new Buffer(img.data, 'binary')
         }).save(function (err) {
             if (err) {
                 callback(err);
