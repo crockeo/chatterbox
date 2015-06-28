@@ -122,7 +122,7 @@ function post(req, res) {
                     }, function (err, users) {
                         if (err || users.length > 0) {
                             res.json({
-                                error: err,
+                                error  : err,
                                 success: false,
                                 message: 'Either that username or that email is already taken.'
                             });
@@ -131,13 +131,13 @@ function post(req, res) {
                         }
 
                         var oldUser = JSON.stringify(user);
+
                         user.email    = req.body.update.email    === undefined ? user.email    : req.body.update.email;
                         user.username = req.body.update.username === undefined ? user.username : req.body.update.username;
-                        user.password = req.body.update.password === undefined ? user.password : req.body.update.password;
                         user.picture  = req.body.update.picture  === undefined ? user.picture  : req.body.update.picture;
 
-                        if (JSON.stringify(user) == oldUser) {
-                            res.json({
+                        if (req.body.update.npassword === '' && JSON.stringify(user) == oldUser) {
+                            return res.json({
                                 error: null,
                                 success: false,
                                 message: 'Nothing to update!'
@@ -146,32 +146,53 @@ function post(req, res) {
                             return;
                         }
 
-                        user.save(function (err) {
-                            if (err) {
-                                res.json({
-                                    error: err,
-                                    success: false,
-                                    message: 'Failed to update your profile.'
-                                });
+                        // Storing the functionality to save a user because I
+                        // need to optionally hash a new password before saving
+                        // the user.
+                        var saveUser = function () {
+                            user.save(function (err) {
+                                if (err) {
+                                    res.json({
+                                        error: err,
+                                        success: false,
+                                        message: 'Failed to update your profile.'
+                                    });
 
-                                return;
-                            }
+                                    return;
+                                }
 
-                            common.generateAuthCookie({
-                                username: user.username,
-                                password: user.password,
-                                remember: true
-                            }, function (err, authCookie) {
-                                if (!err)
-                                    res.set('Set-Cookie', authCookie);
+                                common.generateAuthCookie({
+                                    username: user.username,
+                                    password: user.password,
+                                    remember: true
+                                }, function (err, authCookie) {
+                                    if (!err)
+                                        res.set('Set-Cookie', authCookie);
 
-                                res.json({
-                                    error: null,
-                                    success: true,
-                                    message: 'Updated your profile.'
+                                    res.json({
+                                        error: null,
+                                        success: true,
+                                        message: 'Updated your profile.'
+                                    });
                                 });
                             });
-                        });
+                        };
+
+                        if (req.body.update.npassword !== '') {
+                            bcrypt.hash(req.body.update.npassword, 10, function (err, hash) {
+                                if (err) {
+                                    return res.json({
+                                        error  : err,
+                                        success: false,
+                                        message: 'Failed to hash the new password.'
+                                    });
+                                }
+
+                                user.password = hash;
+                                saveUser();
+                            });
+                        } else
+                            saveUser();
                     });
                 });
             });

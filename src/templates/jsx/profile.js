@@ -70,27 +70,59 @@ var ProfilePage = React.createClass({
         reader.readAsBinaryString(image);
     },
 
-    // Running some piece of code when the update profile form is submitted.
-    onSubmit: function (e) {
-        e.preventDefault();
-
+    // Updating the profile
+    updateProfile: function (response) {
         var username   = this.refs.username.getDOMNode(),
             email      = this.refs.email.getDOMNode(),
             npassword  = this.refs.npassword.getDOMNode(),
             cnpassword = this.refs.cnpassword.getDOMNode(),
-            picture    = this.refs.picture.getDOMNode(),
             password   = this.refs.password.getDOMNode();
 
-        // Making sure that you've selected a new picture.
-        if (picture.files.length !== 1) {
-            handleFormSubmitJSON.bind(this)({
-                error  : false,
-                success: false,
-                message: 'You have to select an image.'
-            });
-
+        if (response !== undefined && (response.error || !response.success)) {
+            handleFormSubmitJSON.bind(this)(response);
             return;
         }
+
+        makeRequest({
+            method: 'POST',
+            path  : '/api/user',
+
+            body: JSON.stringify({
+                auth    : Cookies.get('auth'),
+                password: password.value,
+
+                update: {
+                    username : username.value === this.props.user.username || username.value === '' ? undefined : username.value,
+                    email    : email.value    === this.props.user.email    || email.value    === '' ? undefined : email.value,
+                    npassword: npassword.value,
+                    picture  : response === undefined ? undefined : response.id
+                }
+            }),
+
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept'      : 'application/json'
+            },
+
+            onload: function (response) {
+                handleFormSubmit.bind(this)(response);
+
+                var json = JSON.parse(response);
+                setTimeout(function () {
+                    if (json.success)
+                        window.location = '/profile.html';
+                }, GLOBAL_REDIRECT_TIME);
+            }.bind(this)
+        });
+    },
+
+    // Running some piece of code when the update profile form is submitted.
+    onSubmit: function (e) {
+        e.preventDefault();
+
+        var picture    = this.refs.picture.getDOMNode(),
+            npassword  = this.refs.npassword.getDOMNode(),
+            cnpassword = this.refs.cnpassword.getDOMNode();
 
         // Making sure that the new passwords match.
         if (npassword.value !== cnpassword.value) {
@@ -103,49 +135,20 @@ var ProfilePage = React.createClass({
             return;
         }
 
-        // TODO:
-        //   The order of these operations implies that even if the 2nd request
-        //   fails, it's still going to be uploading an image. Which is kind of
-        //   not really what I want. So I guess come back here and fix it at
-        //   some point in the future.
-        this.uploadImage(picture.files[0], function (response) {
-            if (response.error || !response.success) {
-                handleFormSubmitJSON.bind(this)(response);
-                return;
-            }
+        // Only updating the profile if no picture is selected.
+        if (picture.files.length === 0)
+            return this.updateProfile();
 
-            makeRequest({
-                method: 'POST',
-                path  : '/api/user',
-
-                body: JSON.stringify({
-                    auth    : Cookies.get('auth'),
-                    password: password.value,
-
-                    update: {
-                        username : username.value === this.props.user.username || username.value === '' ? undefined : username.value,
-                        email    : email.value    === this.props.user.email    || email.value    === '' ? undefined : email.value,
-                        npassword: npassword.value,
-                        picture  : response.id
-                    }
-                }),
-
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept'      : 'application/json'
-                },
-
-                onload: function (response) {
-                    handleFormSubmit.bind(this)(response);
-
-                    var json = JSON.parse(response);
-                    setTimeout(function () {
-                        if (json.success)
-                            window.location = '/profile.html';
-                    }, GLOBAL_REDIRECT_TIME);
-                }.bind(this)
+        // Making sure you only pick a single file.
+        if (picture.files.length > 1) {
+            return handleFormSubmitJSON.bind(this)({
+                error  : false,
+                success: false,
+                message: 'You can only select a single file.'
             });
-        }.bind(this));
+        }
+
+        this.uploadImage(picture.files[0], this.updateProfile);
     },
 
     // Setting the initial values of the form.
