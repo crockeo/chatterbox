@@ -41,10 +41,18 @@ var schema = {
         chatName: String
     }),
 
+    // Storing a raw image file in the database.
     Img: mongoose.model('Img', {
         id         : Number,
         contentType: String,
         data       : Buffer
+    }),
+
+    // Storing the preferred channels for a user to auto-join on the next page
+    // load.
+    ChannelPref: mongoose.model('ChannelPref', {
+        username: String,
+        channels: [String]
     })
 };
 
