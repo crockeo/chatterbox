@@ -92,7 +92,7 @@ function post(req, res) {
                     password: hash,
                     created : new Date(),
                     verified: null,
-                    picture : 'blank_user_profile.jpg'
+                    picture : 'default'
                 }).save(function (err) {
                     if (err) {
                         res.json({
