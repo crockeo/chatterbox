@@ -97,6 +97,26 @@ withGlobal(function (global) {
                     }.bind(this)
                 });
             }.bind(this));
+
+            // Being alerted of the registration being complete.
+            this.props.socket.on('registered', function () {
+                makeRequest({
+                    method: 'GET',
+                    path: '/api/channelpref',
+
+                    onload: function (response) {
+                        var json;
+                        try       { json = JSON.parse(response);    }
+                        catch (e) { console.log(String(e)); return; }
+
+                        // TODO: When I join right here it doesn't actually add me
+                        //       to the list of users and I forget why. So go find
+                        //       out.
+                        for (var i = 0; i < json.channels.length; i++)
+                            this.props.socket.emit('join', { name: json.channels[i] });
+                    }.bind(this)
+                });
+            }.bind(this));
         },
 
         // Functionality to represent a disconnection from the server.

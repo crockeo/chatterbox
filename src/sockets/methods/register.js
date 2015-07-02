@@ -7,8 +7,7 @@
 /////////////
 // Imports //
 var common = require('../../common.js'),
-    helper = require('../helper.js'),
-    join   = require('./join.js');
+    helper = require('../helper.js');
 
 //////////
 // Code //
@@ -31,14 +30,10 @@ function register(io, socket) {
                     auth    : jCookie.auth
                 });
 
-                join.join(io, socket)({
-                    name: 'main'
-                });
-
                 socket.emit('message', helper.serverMessage('Logged in to the server.'));
             }
 
-            socket.join('main');
+            socket.emit('registered');
         });
     };
 }
