@@ -9,7 +9,7 @@ that I want done, but aren't yet.
 * Caching messages.
 * Channel management.
 * Password-channel authentication.
-* Saving implicit user preferences.
+* Saving implicit user preferences. - **DONE**
 
 ## TODOs: Expanded
 
