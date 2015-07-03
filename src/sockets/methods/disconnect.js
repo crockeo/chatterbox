@@ -6,7 +6,8 @@
 
 /////////////
 // Imports //
-var helper = require('../helper.js');
+var channelpref = require('../../api/channelpref.js'),
+    helper      = require('../helper.js');
 
 //////////
 // Code //
@@ -16,6 +17,12 @@ function disconnect(io, socket) {
     return function () {
         var validation = helper.getValidation(socket.id);
         if (validation !== undefined) {
+            channelpref.updateChannelPref(validation.username, validation.channels, function (err) {
+                if (err) {
+                    console.log('Failed to update channel preferences for "' + validation.username + '": ' + String(err));
+                }
+            });
+
             for (var i = 0; i < validation.channels.length; i++) {
                 io.emit('userdisconnect', {
                     username: validation.username,

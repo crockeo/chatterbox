@@ -14,6 +14,32 @@ var database = require('../database.js'),
 //////////
 // Code //
 
+// Updating the channel preferences of a given user - publicly available to the
+// rest of the program such that you needn't query the API to use it from the
+// server itself.
+function updateChannelPref(username, channels, callback) {
+    if (typeof callback === 'undefined')
+        callback = function () { };
+
+    database.schema.ChannelPref.find({
+        username: username
+    }, function (err, channelPrefs) {
+        if (err)
+            return callback(err);
+        if (channelPrefs.length !== 1)
+            return callback(new Error('Expected 1 channel preference but got: ' + channelPrefs.length));
+
+        var channelPref = channelPrefs[0];
+        channelPref.channels = channels;
+
+        channelPref.save(function (err) {
+            if (err)
+                return callback(err);
+            callback(null);
+        });
+    });
+}
+
 // Trying to access the list of channels a user is subscribed to.
 function get(req, res) {
     var eVal = { channels: ['main'] };
@@ -79,12 +105,18 @@ function post(req, res) {
             });
         }
 
-        // TODO: Actually updating.
+        console.log('Got a request.');
+        res.json({
+            error  : false,
+            success: false,
+            message: ''
+        });
     });
 }
 
 /////////////
 // Exports //
-module.exports.path = '/channelpref';
-module.exports.get  = get;
-module.exports.post = post;
+module.exports.updateChannelPref = updateChannelPref;
+module.exports.path              = '/channelpref';
+module.exports.get               = get;
+module.exports.post              = post;
