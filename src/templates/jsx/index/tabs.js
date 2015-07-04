@@ -14,7 +14,7 @@ withGlobal(function (global) {
         // Rendering the current TabElement.
         render: function () {
             var c = this.props.selected ? 'tab-element selected' : 'tab-element';
-            if (this.props.name === 'system') {
+            if (this.props.name === 'system' || !this.props.selected) {
                 return (
                     <span className={c} onClick={this.props.selectTab(this.props.name)}>
                         <span className="tab-element-name">{this.props.name}</span>
@@ -24,6 +24,7 @@ withGlobal(function (global) {
                 return (
                     <span className={c} onClick={this.props.selectTab(this.props.name)}>
                         <span className="tab-element-name">{this.props.name}</span>
+                        <a href={'/channelmanager.html?name=' + this.props.name} onClick={this.preventNav}><span className="tab-element-close glyphicon glyphicon-cog"></span></a>
                         <span className="tab-element-close glyphicon glyphicon-remove" onClick={this.props.closeTab(this.props.name)}></span>
                     </span>
                 );
