@@ -12,7 +12,7 @@ var database = require('../../database.js'),
 //////////
 // Code //
 
-//
+// Actually joining a given channel on a given socket.
 function doRealJoin(io, socket, channel) {
     setTimeout(function () {
         console.log('Joining: ' + channel);
@@ -49,10 +49,18 @@ function join(io, socket) {
                 return;
             }
 
+            var validation = helper.getValidation(socket.id);
+            if (channels.length === 0 && validation === undefined) {
+                return socket.emit('joinerr', {
+                    err    : new Error('Unregistered users cannot create new channels.'),
+                    message:           'Unregistered users cannot create new channels.'
+                });
+            }
+
             if (channels.length === 0) {
                 new database.schema.Channel({
                     name    : channel.name,
-                    authType: 'open',
+                    authType: 'invite',
                     password: null
                 }).save(function (err) {
                     if (err) {
@@ -63,8 +71,22 @@ function join(io, socket) {
 
                         return;
                     }
+                    new database.schema.InChannel({
+                        username : validation.username,
+                        chatname : channel.name,
+                        authLevel: 0
+                    }).save(function (err) {
+                        if (err) {
+                            socket.emit('joinerr', {
+                                err    : err,
+                                message: 'Failed to set up user ownership.'
+                            });
 
-                    doRealJoin(io, socket, channel.name);
+                            return;
+                        }
+
+                        doRealJoin(io, socket, channel.name);
+                    });
                 });
 
                 return;

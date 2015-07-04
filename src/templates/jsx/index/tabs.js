@@ -24,7 +24,7 @@ withGlobal(function (global) {
                 return (
                     <span className={c} onClick={this.props.selectTab(this.props.name)}>
                         <span className="tab-element-name">{this.props.name}</span>
-                        <a href={'/channelmanager.html?name=' + this.props.name} onClick={this.preventNav}><span className="tab-element-close glyphicon glyphicon-cog"></span></a>
+                        <a href={'/channelmanager.html?channel=' + this.props.name} onClick={this.preventNav}><span className="tab-element-close glyphicon glyphicon-cog"></span></a>
                         <span className="tab-element-close glyphicon glyphicon-remove" onClick={this.props.closeTab(this.props.name)}></span>
                     </span>
                 );
@@ -76,6 +76,11 @@ withGlobal(function (global) {
         // Registering on a confirmed join with the list of tabs.
         componentDidMount: function () {
             this.props.socket.on('join', this.realAddTab);
+
+            // Logging errors upon failing to join a channel.
+            this.props.socket.on('joinerr', function (err) {
+                console.log(err.message);
+            });
         },
 
         // Selecting a new tab.

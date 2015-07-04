@@ -29,6 +29,13 @@ var schema = {
 
     // A schema to represent a chat channel. It includes information about
     // authentication methods to enter a channel.
+    //
+    // authType options:
+    //   'open'     - Anyone can join this channel.
+    //   'password' - Anyone can join this channel so long as they have the
+    //                correct password.
+    //   'invite'   - Only those who have been invited to the channel can join
+    //                the channel.
     Channel: mongoose.model('Channel', {
         name    : String,
         authType: String,
@@ -36,9 +43,14 @@ var schema = {
     }),
 
     // Cacheing whether or not a user is authenticated to be part of a channel.
+    // Authorization levels follow:
+    //   0 - Admin
+    //   1 - Moderator
+    //   2 - User
     InChannel: mongoose.model('InChannel', {
-        username: String,
-        chatName: String
+        username : String,
+        chatName : String,
+        authLevel: Number
     }),
 
     // Storing a raw image file in the database.
