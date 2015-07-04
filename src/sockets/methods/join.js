@@ -73,7 +73,7 @@ function join(io, socket) {
                     }
                     new database.schema.InChannel({
                         username : validation.username,
-                        chatname : channel.name,
+                        chatName : channel.name,
                         authLevel: 0
                     }).save(function (err) {
                         if (err) {
