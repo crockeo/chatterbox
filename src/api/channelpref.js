@@ -26,6 +26,19 @@ function updateChannelPref(username, channels, callback) {
     }, function (err, channelPrefs) {
         if (err)
             return callback(err);
+
+        // Saving a new channel preference if none exists for the user.
+        if (channelPrefs.length === 0) {
+            new database.schema.ChannelPref({
+                username: username,
+                channels: channels
+            }).save(function (err) {
+                callback(err);
+            });
+
+            return;
+        }
+
         if (channelPrefs.length !== 1)
             return callback(new Error('Expected 1 channel preference but got: ' + channelPrefs.length));
 
