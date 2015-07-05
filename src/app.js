@@ -20,14 +20,60 @@ var io      = require('socket.io'),
 //////////
 // Code //
 
-// Creating the app.
-var app = express();
-
 // Connecting to the database.
 var url = process.env.MONGO_URL;
 if (url === undefined)
   url = 'mongodb://localhost/chatterbox';
   database.connect(url);
+
+// BE CAREFUL AROUND HERE
+//
+// If you run this program w/ a 'cleandb' argument, it will go through all of
+// the existent schemas in the database.js file and remove them.
+var si;
+if (process.argv[0] === 'node')
+    si = 2;
+else if (process.argv[0] === 'chatterbox')
+    si = 1;
+
+if (process.argv[si] === 'cleandb') {
+    console.log('Are you sure you want to clean out the database?');
+    console.log('Press any key to continue, and ^C to exit.');
+
+    process.stdin.resume();
+    process.stdin.setEncoding('utf8');
+    process.stdin.once('data', function (chunk) {
+        var keys = [];
+        for (var key in database.schema)
+            if (database.schema.hasOwnProperty(key))
+                keys.push(key);
+
+        var removeSchema = function (index, callback) {
+            if (index >= keys.length)
+                return callback();
+
+            database.schema[keys[index]].remove({}, function (err) {
+                if (err) {
+                    console.log('Failed to remove "' + keys[index] + '" from the database.');
+                    process.exit();
+                }
+
+                console.log('Removing "' + keys[index] + '".');
+                removeSchema(index + 1, callback);
+            });
+        };
+
+        removeSchema(0, function () {
+            console.log('Done!');
+            process.exit();
+        });
+    });
+
+    return;
+}
+
+// Creating the app.
+var app = express();
 
 // Determining the port of the app.
 var port = process.env.PORT;
