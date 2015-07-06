@@ -26,7 +26,7 @@ withGlobal(function (global) {
                 path: '/api/invite',
 
                 headers: {
-                    'ContentType': 'application/json',
+                    'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
 
