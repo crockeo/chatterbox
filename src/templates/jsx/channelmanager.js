@@ -5,13 +5,84 @@
 //   The front-end for rendering the channel management page.
 
 withGlobal(function (global) {
-    var UserRender = React.createClass({
+    // A form specifically made to invite users.
+    var InviteUserForm = React.createClass({
+        // Defining the form schema.
+        getInitialState: function () {
+            return {
+                errorClass: '',
+                error: ''
+            };
+        },
+
+        // Trying to submit an invite request for a user to a given channel.
+        onSubmit: function (e) {
+            e.preventDefault();
+
+            var username = this.refs.username.getDOMNode();
+
+            makeRequest({
+                method: 'POST',
+                path: '/api/invite',
+
+                headers: {
+                    'ContentType': 'application/json',
+                    'Accept': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    username: username.value,
+                    channel : this.props.channel
+                }),
+
+                onload: function (response) {
+                    // TODO: Actually handle the response.
+                    handleFormSubmit.bind(this)(response);
+                    username.value = '';
+                }.bind(this)
+            });
+        },
+
+        // Rendering the invite form.
         render: function () {
             return (
-                <div>
-                    <h2>Users</h2>
-                    <h3>{this.props.info.username} - {this.props.info.authLevel}</h3>
-                </div>
+                <form onSubmit={this.onSubmit}>
+                    <label className={this.state.errorClass}>{this.state.error}</label>
+
+                    <div className="form-group">
+                        <input ref="username" className="form-control" type="text" placeholder="Enter username." required />
+                    </div>
+
+                    <button className="btn btn-default" type="submit">Invite</button>
+                </form>
+            );
+        }
+    });
+
+    // Rendering a whole bunch of users at once.
+    var UsersRender = React.createClass({
+        render: function () {
+            var users = [];
+            for (var i = 0; i < this.props.users.length; i++) {
+                users.push(
+                    <tr key={i}>
+                        <td>{this.props.users[i].username}</td>
+                        <td>{this.props.users[i].authLevel}</td>
+                    </tr>
+                );
+            }
+
+            return (
+                <table className="table table-striped table-bordered">
+                    <tr>
+                        <th>Username</th>
+                        <th>Auth Level</th>
+                    </tr>
+
+                    <tbody>
+                        {users}
+                    </tbody>
+                </table>
             );
         }
     });
@@ -42,6 +113,12 @@ withGlobal(function (global) {
 
         // Rendering out the ChatOption.
         render: function () {
+            var toggleButton;
+            if (this.props.canExpand)
+                toggleButton = <h4 className="chat-option-change" onClick={this.toggle}><span className={this.toggleDirection()}></span></h4>;
+            else
+                toggleButton = <span></span>
+
             return (
                 <div className="chat-option">
                     <h4>{this.props.prefix}: <code>{this.props.value}</code></h4>
@@ -50,7 +127,7 @@ withGlobal(function (global) {
                         {this.props.children}
                     </div>
 
-                    <h4 className="chat-option-change" onClick={this.toggle}><span className={this.toggleDirection()}></span></h4>
+                    {toggleButton}
                 </div>
             );
         }
@@ -59,27 +136,33 @@ withGlobal(function (global) {
     // Displaying the chat channel manager if you did receive full informtaion.
     var ChannelManager = React.createClass({
         render: function () {
-            var users = [];
-            for (var i = 0; i < this.props.info.users.length; i++)
-                users.push(<UserRender info={this.props.info.users[i]} key={i} />);
-
             return (
                 <div className="container">
                     <h2>{this.props.info.name}</h2>
 
-                    <ChatOption prefix="Authorization Type" value={this.props.info.authType}>
-                        <h2>Testing</h2>
+                    <ChatOption value={this.props.info.authType}
+                                prefix="Authorization Type"
+                                canExpand={true}>
+                        <h2>Nothing here yet!</h2>
                     </ChatOption>
 
-                    <ChatOption prefix="Exists" value={String(this.props.info.exists)} />
+                    <ChatOption value={String(this.props.info.exists)}
+                                canExpand={false}
+                                prefix="Exists" />
 
-                    <h2>Channel</h2>
-                    <h3>Name: {this.props.info.name}</h3>
-                    <h3>Auth Type: {this.props.info.authType}</h3>
-                    <h3>Exists: {String(this.props.info.exists)}</h3>
-                    <h3>Full: {String(this.props.info.full)}</h3>
+                    <ChatOption value={String(this.props.info.users.length)}
+                                canExpand={true}
+                                prefix="Users">
+                        <InviteUserForm channel={this.props.channel} />
 
-                    {users}
+                        <hr className="dark-hr" />
+
+                        <UsersRender users={this.props.info.users} />
+                    </ChatOption>
+
+                    <ChatOption value={String(this.props.info.full)}
+                                canExpand={false}
+                                prefix="Full" />
                 </div>
             );
         }
@@ -148,7 +231,7 @@ withGlobal(function (global) {
             if (this.state.channelInfo === null)
                 return <h1 className="text-center">Loading...</h1>;
             else if (this.state.channelInfo.full)
-                return <ChannelManager info={this.state.channelInfo} />;
+                return <ChannelManager info={this.state.channelInfo} channel={this.props.channel} />;
             else if (!this.state.channelInfo.full)
                 return <ChannelInfo info={this.state.channelInfo} />;
         }
