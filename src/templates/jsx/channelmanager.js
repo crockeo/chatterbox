@@ -36,9 +36,21 @@ withGlobal(function (global) {
                 }),
 
                 onload: function (response) {
-                    // TODO: Actually handle the response.
                     handleFormSubmit.bind(this)(response);
-                    username.value = '';
+
+                    var json;
+                    try { json = JSON.parse(response); }
+                    catch (e) {
+                        console.log('Failed to parse /api/invite response.');
+                        return;
+                    }
+
+                    if (json.success) {
+                        username.value = '';
+                        setTimeout(function () {
+                            window.location = window.location;
+                        }, GLOBAL_REDIRECT_TIME);
+                    }
                 }.bind(this)
             });
         },

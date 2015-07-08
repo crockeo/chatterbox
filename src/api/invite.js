@@ -41,7 +41,6 @@ function canInvite(auth, channel, callback) {
 
 // Handling a POST request to this API endpoint.
 function post(req, res) {
-    console.log(req.body);
     common.allExists(req.body, ['username', 'channel'], function (exists) {
         if (!exists) {
             return res.json({
@@ -68,10 +67,65 @@ function post(req, res) {
                 });
             }
 
-            res.json({
-                error  : null,
-                success: false,
-                message: 'Not yet implemented.'
+            database.schema.User.find({
+                username: req.body.username
+            }, function (err, users) {
+                if (err) {
+                    return res.json({
+                        error  : err,
+                        success: false,
+                        message: 'There was an error in checking the existence of that user.'
+                    });
+                }
+
+                if (users.length === 0) {
+                    return res.json({
+                        error  : null,
+                        success: false,
+                        message: 'That user does not exist.'
+                    });
+                }
+
+                database.schema.InChannel.find({
+                    username: req.body.username,
+                    chatName: req.body.channel
+                }, function (err, invites) {
+                    if (err) {
+                        return res.json({
+                            error  : err,
+                            success: false,
+                            message: 'Failed to search for existent users.'
+                        });
+                    }
+
+                    if (invites.length > 0) {
+                        return res.json({
+                            error  : null,
+                            success: false,
+                            message: 'That user is already in this channel.'
+                        });
+                    }
+
+                    new database.schema.InChannel({
+                        username : req.body.username,
+                        chatName : req.body.channel,
+                        authLevel: 2
+                    }).save(function (err) {
+                        if (err) {
+                            return res.json({
+                                error  : err,
+                                success: false,
+                                message: 'Error in saving the user invite to the database.'
+                            });
+                        }
+
+                        res.json({
+                            error  : null,
+                            success: true,
+                            message: 'Successfully invited the user!'
+                        });
+                    });
+                });
             });
         });
     });
