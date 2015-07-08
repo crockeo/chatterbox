@@ -11,6 +11,11 @@ that I want done, but aren't yet.
 * Password-channel authentication.
 * Saving implicit user preferences. - **DONE**
 
+**AFTER EVERYTHING ELSE IS DONE**
+
+* Read some information on the internet about UI design and do a final redesign
+  of the site.
+
 ## TODOs: Expanded
 
 * Multimedia message formats &mdash; Right now you can only send text messages
