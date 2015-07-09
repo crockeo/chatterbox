@@ -60,8 +60,15 @@ withGlobal(function (global) {
             if (this.props.connected) {
                 e.preventDefault();
 
-                var chatInput = this.refs.chatInput.getDOMNode();
-                var auth      = Cookies.get('auth');
+                var chatInput = this.refs.chatInput.getDOMNode(),
+                    text      = chatInput.value.trim();
+
+                // Preventing the user from sending any messages that don't have
+                // any text.
+                if (text == '')
+                    return;
+
+                var auth = Cookies.get('auth');
 
                 try       { auth = JSON.parse(auth); }
                 catch (e) { auth = {};               }
@@ -70,7 +77,7 @@ withGlobal(function (global) {
                     channel : this.props.channel,
                     username: auth.username,
                     auth    : auth.auth,
-                    text    : chatInput.value,
+                    text    : text,
                     time    : new Date()
                 });
 
