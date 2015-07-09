@@ -72,7 +72,7 @@
 }
 
 .chat-form {
-    background: $darkColor;
+    background: $primaryColor;
     padding: 4px;
     height: 56px;
     margin: 0px;
@@ -83,15 +83,33 @@
     border: none;
     height: 48px;
     width: 90%;
+
+    background: linear-gradient(
+        darken(#fff, 12%),
+        #fff 10%
+    );
 }
 
 .chat-button {
-    background: $lightColor;
     border-radius: 0px;
     border-style: none;
     height: 48px;
     color: #fff;
     width: 10%;
+
+    background: linear-gradient(
+        lighten($lightColor, 3%),
+        $lightColor 20%,
+        darken($lightColor, 3%) 80%
+    );
+
+    &:active {
+        box-shadow: 0px -1px 0px darken($darkColor, 12%);
+        background: linear-gradient(
+            darken($darkColor, 12%),
+            $darkColor 10%
+        );
+    }
 }
 
 /*
@@ -142,13 +160,22 @@
 
 .tab-element {
     box-shadow: 2px 0px 0px $primaryColor, -2px 0px 0px $primaryColor;
-    background: $lightColor;
-    padding: 13px 14px;
-    margin: 0px 1px;
+    margin: 0px 2px 0px 0px;
+    display: inline-block;
+    padding: 11px 14px;
     color: #fff;
 
+    background: linear-gradient(
+        lighten($lightColor, 3%),
+        $lightColor 20%,
+        darken($lightColor, 3%) 80%
+    );
+
     &.selected {
-        background: lighten($lightColor, 6%);
+        background: linear-gradient(
+            darken($lightColor, 6%),
+            lighten($lightColor, 6%) 10%
+        );
     }
 }
 
@@ -222,6 +249,11 @@ $formWidth: 160px;
     height: 100%;
     width: 100%;
 
+    background: linear-gradient(
+        darken(#fff, 12%),
+        #fff 10%
+    );
+
     &.expanding {
         @include animation('paddingExpand #{$slideDuration} ease-in 1 forwards');
         padding: 0px 0px;
@@ -236,8 +268,15 @@ $formWidth: 160px;
 .tab-add {
     box-shadow: 1px 0px 0px $lightColor, 1px 0px 1px $lightColor, -1px 0px 0px $lightColor;
     border-radius: 0px 10px 10px 0px;
-    padding: 13px 16px;
+    display: inline-block;
+    padding: 11px 16px;
     font-weight: bold;
+
+    background: linear-gradient(
+        #fff,
+        #eee 20%,
+        #ddd 80%
+    );
 
     &:hover {
         cursor: pointer;
