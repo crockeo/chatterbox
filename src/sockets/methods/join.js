@@ -50,14 +50,14 @@ function join(io, socket) {
             }
 
             var validation = helper.getValidation(socket.id);
-            if (channels.length === 0 && validation === undefined) {
-                return socket.emit('joinerr', {
-                    err    : new Error('Unregistered users cannot create new channels.'),
-                    message:           'Unregistered users cannot create new channels.'
-                });
-            }
-
             if (channels.length === 0) {
+                if (validation === undefined) {
+                    return socket.emit('joinerr', {
+                        err    : new Error('Unregistered users cannot create new channels.'),
+                        message:           'Unregistered users cannot create new channels.'
+                    });
+                }
+
                 new database.schema.Channel({
                     name    : channel.name,
                     authType: 'invite',
@@ -71,6 +71,7 @@ function join(io, socket) {
 
                         return;
                     }
+
                     new database.schema.InChannel({
                         username : validation.username,
                         chatName : channel.name,
@@ -100,34 +101,47 @@ function join(io, socket) {
                 return;
             }
 
-            // Requiring a password to join a password that needs a password.
-            if (dbChannel.authType == 'password') {
-                if (dbChannel.password === channel.password)
-                    doRealJoin(io, socket, channel.name);
-                else {
-                    socket.emit('joinerr', {
-                        err    : null,
-                        message: 'Invalid channel password.'
-                    });
-                }
-
-                return;
-            }
-
-            // Requiring a user to have been invited to a channel to join an
-            // invite-only channel.
-            if (dbChannel.authType == 'invite') {
+            // Trying to join a closed channel. One must either be invited or
+            // have the correct password (on a password-authorization channel).
+            if (dbChannel.authType == 'password' || dbChannel.authType == 'invite') {
                 database.schema.InChannel.find({
                     username: channel.username,
                     chatName: channel.chatName
                 }, function (err, matches) {
-                    if (err || matches.length !== 0) {
-                        socket.emit('joinerr', {
-                            err    : null,
-                            message: 'Failed to join invite-only channel.'
-                        });
+                    if (err || matches.length === 0) {
+                        // Even if there are no InChannels we still try to log
+                        // in users to a 'password' channel.
+                        if (dbChannel.authType == 'password') {
+                            // Failing to log in.
+                            if (dbChannel.password !== channel.password) {
+                                return socket.emit('joinerr', {
+                                    err    : null,
+                                    message: 'Invalid channel password.'
+                                });
+                            }
 
-                        return;
+                            // Creating an InChannel for that user if they're
+                            // logged in and they have the right channel
+                            // password.
+                            if (validation !== undefined) {
+                                return new database.schema.InChannel({
+                                    username : validation.username,
+                                    chatName : channel.name,
+                                    authLevel: 0
+                                }).save(function (err) {
+                                    if (err) {
+                                        socket.emit('joinerr', {
+                                            err    : err,
+                                            message: 'Failed to set up user ownership.'
+                                        });
+
+                                        return;
+                                    }
+
+                                    doRealJoin(io, socket, channel.name);
+                                });
+                            }
+                        }
                     }
 
                     doRealJoin(io, socket, channel.name);
@@ -135,8 +149,8 @@ function join(io, socket) {
 
                 return;
             }
-        });
 
+        });
     };
 }
 
