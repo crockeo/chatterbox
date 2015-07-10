@@ -5,6 +5,98 @@
 //   The front-end for rendering the channel management page.
 
 withGlobal(function (global) {
+    // A form to change the authorization type of a channel.
+    var ChangeAuthForm = React.createClass({
+        getInitialState: function () {
+            return {
+                passwordGroupClass: ' hidden',
+                errorClass: '',
+                error: ''
+            };
+        },
+
+        // Making sure that the proper value is selected by default.
+        componentDidMount: function () {
+            this.refs.newAuth.getDOMNode().value = this.props.authType;
+            this.checkPasswordGroupClass();
+        },
+
+        // Trying to submit a new authorization type for a channel.
+        onSubmit: function (e) {
+            e.preventDefault();
+
+            var newAuth     = this.refs.newAuth.getDOMNode(),
+                newPassword = this.refs.newPassword.getDOMNode();
+
+            // Constructing the request data.
+            var json = {
+                channel: this.props.channel,
+                newAuth: newAuth.value
+            };
+
+            if (newPassword.value.trim() !== '')
+                json.newPassword = newPassword.value.trim();
+
+            // Trying to change the authtype.
+            makeRequest({
+                method: 'POST',
+                path: '/api/channel/authtype',
+
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+
+                body: JSON.stringify(json),
+
+                onload: function (response) {
+                    handleFormSubmit.bind(this)(response);
+
+                    var json;
+                    try { json = JSON.parse(response); }
+                    catch (e) {
+                        console.log('Failed to parse /api/channel/authtype response.');
+                        return;
+                    }
+
+                    if (json.success)
+                        this.refs.newPassword.value = '';
+                }.bind(this)
+            });
+        },
+
+        // Checking & possibly updating the passwordGroupClass.
+        checkPasswordGroupClass: function () {
+            if (this.refs.newAuth.getDOMNode().value === 'password')
+                this.setState({ passwordGroupClass: '' });
+            else
+                this.setState({ passwordGroupClass: ' hidden' });
+        },
+
+        // Rendering out this form.
+        render: function () {
+            return (
+                <form onSubmit={this.onSubmit}>
+                    <label className={this.state.errorClass}>{this.state.error}</label>
+                    <div className="form-group">
+                        <label>Authorization Type</label><br />
+                        <select onChange={this.checkPasswordGroupClass} ref="newAuth">
+                            <option value="open">Open</option>
+                            <option value="password">Password</option>
+                            <option value="invite">Invite</option>
+                        </select>
+                    </div>
+
+                    <div className={'form-group' + this.state.passwordGroupClass}>
+                        <input ref="newPassword" type="text" className="form-control" placeholder="Enter new channel password." />
+                    </div>
+
+                    <button className="btn btn-default">Submit</button>
+                </form>
+            );
+        }
+    });
+
     // A form specifically made to invite users.
     var InviteUserForm = React.createClass({
         // Defining the form schema.
@@ -91,7 +183,7 @@ withGlobal(function (global) {
                         <th>Auth Level</th>
                     </tr>
 
-                    <tbody>
+                    <tbody className="user-table">
                         {users}
                     </tbody>
                 </table>
@@ -155,7 +247,8 @@ withGlobal(function (global) {
                     <ChatOption value={this.props.info.authType}
                                 prefix="Authorization Type"
                                 canExpand={true}>
-                        <h2>Nothing here yet!</h2>
+                        <ChangeAuthForm authType={this.props.info.authType}
+                                        channel={this.props.channel} />
                     </ChatOption>
 
                     <ChatOption value={String(this.props.info.exists)}

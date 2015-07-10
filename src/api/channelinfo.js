@@ -6,7 +6,8 @@
 
 /////////////
 // Imports //
-var database = require('../database.js')
+var database = require('../database.js'),
+    channel  = require('../channel.js'),
     common   = require('../common.js');
 
 //////////
@@ -18,23 +19,6 @@ function noSuchChannel(res, err) {
         error  : err === undefined ? null : err,
         exists : false,
         message: 'No such channel exists.'
-    });
-}
-
-// Finding the user's authorization level for a given channel name.
-function authLevel(channel, auth, callback) {
-    common.isLoggedJSON(auth, function (err, logged) {
-        if (err || !logged)
-            return callback(2);
-
-        database.schema.InChannel.find({
-            username: auth.username,
-            chatName: channel
-        }, function (err, inChannels) {
-            if (err || inChannels.length === 0)
-                return callback(2);
-            callback(inChannels[0].authLevel);
-        });
     });
 }
 
@@ -54,15 +38,14 @@ function get(req, res) {
         data.authType = channels[0].authType;
         data.exists   = true;
 
-        var auth;
-        try       { auth = JSON.parse(req.cookies.auth); }
-        catch (e) {
-            data.full    = false;
-            data.message = 'Couldn\'t parse auth cookie: ' + String(e);
-            return res.json(data);
-        }
+        channel.getAuthLevel(req.query.channel, req.cookies.auth, function (err, authLevel) {
+            if (err) {
+                data.full    = false;
+                data.message = String(err);
 
-        authLevel(req.query.channel, auth, function (authLevel) {
+                return res.json(data);
+            }
+
             switch (authLevel) {
             case 0:
             case 1:

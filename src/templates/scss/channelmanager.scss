@@ -36,3 +36,10 @@
     border-color: #333;
     background: #333;
 }
+
+tbody.user-table {
+    overflow-y: scroll;
+    max-height: 100px;
+    height: 100px;
+    width: 100%;
+}
