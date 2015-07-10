@@ -56,7 +56,7 @@ withGlobal(function (global) {
         render: function () {
             return (
                 <form onSubmit={this.onSubmit} className={this.getExpandState('tab-add-form')}>
-                    <input ref="tab" className={this.getExpandState('tab-add-input')} type="text" placeholer="Enter tab name." />
+                    <input ref="tab" className={this.getExpandState('tab-add-input')} type="text" placeholder="Enter tab name." />
                 </form>
             );
         }
