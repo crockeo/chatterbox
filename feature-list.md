@@ -7,7 +7,7 @@ that I want done, but aren't yet.
 
 * Multimedia message formats.
 * Caching messages.
-* Channel management.               - **IN PROGRESS**
+* Channel management.               - **DONE**
 * Password-channel authentication.
 * Saving implicit user preferences. - **DONE**
 
