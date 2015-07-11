@@ -32,32 +32,51 @@ withGlobal(function (global) {
         }
     });
 
-    // The form for trying to join a new channel.
+    // The form for attempting to add a new channel.
     var NewTabForm = React.createClass({
-        // Submitting the new tab name.
+        // Defining the class schema.
+        getInitialState: function () {
+            return {
+                errorClass: '',
+                error: ''
+            };
+        },
+
+        // Attempting to join a new channel (with a given password).
         onSubmit: function (e) {
             e.preventDefault();
 
-            var input = this.refs.tab.getDOMNode();
-            if (this.props.addTab(input.value))
-                input.value = '';
+            this.props.socket.emit('join', {
+                name    : this.refs.channel.getDOMNode().value,
+                password: this.refs.password.getDOMNode().value
+            });
         },
 
-        // Getting whether or not a given thing should be expanding in this app.
-        getExpandState: function(name) {
-            if (this.props.expanding)
-                return name + ' expanding';
-            else if (this.props.hiding)
-                return name + ' hiding';
-            return name;
-        },
-
-        // Rendering the chat form.
+        // Rendering the NewTabForm.
         render: function () {
             return (
-                <form onSubmit={this.onSubmit} className={this.getExpandState('tab-add-form')}>
-                    <input ref="tab" className={this.getExpandState('tab-add-input')} type="text" placeholder="Enter tab name." />
-                </form>
+                <div>
+                    <h3>Join Channel</h3>
+                    <form onSubmit={this.onSubmit}>
+                        <label className={this.state.errorClass}>{this.state.error}</label>
+
+                        <div className="form-group">
+                            <input placeholder="Enter channel name."
+                                className="form-control"
+                                ref="channel"
+                                type="text" />
+                        </div>
+
+                        <div className="form-group">
+                            <input placeholder="Enter password (optional)"
+                                className="form-control"
+                                type="password"
+                                ref="password" />
+                        </div>
+
+                        <button className="btn btn-default">Join</button>
+                    </form>
+                </div>
             );
         }
     });
@@ -67,8 +86,7 @@ withGlobal(function (global) {
         // Defining the schema of the TabList state along w/ default tabs.
         getInitialState: function () {
             return {
-                expandingNewTabForm: false,
-                hidingNewTabForm: false,
+                showNewTabForm: false,
                 tabs: ['system']
             };
         },
@@ -185,11 +203,15 @@ withGlobal(function (global) {
                 <div className="tab-list">
                     {elems}
 
-                    <NewTabForm expanding={this.state.expandingNewTabForm}
-                                hiding={this.state.hidingNewTabForm}
-                                addTab={this.addTab} />
+                    <PageOverlay hideOverlay={function () { this.setState({ showNewTabForm: false }); }.bind(this)}
+                                 show={this.state.showNewTabForm}>
+                        <NewTabForm socket={this.props.socket} />
+                    </PageOverlay>
 
-                    <span className="tab-add" onClick={this.toggleAddTab}>+</span>
+                    <span onClick={function () { this.setState({ showNewTabForm: true }); }.bind(this)}
+                          className="tab-add">
+                        +
+                    </span>
                 </div>
             );
         }

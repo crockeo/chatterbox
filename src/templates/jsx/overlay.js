@@ -49,7 +49,7 @@ withGlobal(function (global) {
             else {
                 setTimeout(function () {
                     this.setState({ hidden: true });
-                }.bind(this), 80);
+                }.bind(this), 100);
             }
         },
 
