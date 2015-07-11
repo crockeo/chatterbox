@@ -10,7 +10,7 @@
 
 (function () {
     // The overlay for logging in.
-    var LoginApp = React.createClass({
+    var LoginForm = React.createClass({
         // Defining the initial schema for this app.
         getInitialState: function () {
             return {
@@ -57,36 +57,32 @@
         // Rendering the LoginApp.
         render: function () {
             return (
-                <div className={'overlay-container ' + this.props.fadeClass}>
-                    <div onClick={this.props.exit} className="overlay-background"></div>
+                <div>
+                    <h3>Login</h3>
+                    <form onSubmit={this.onSubmit} className="overlay-form">
+                        <label className={this.state.errorClass}>{this.state.error}</label>
 
-                    <div className="overlay-form-container">
-                        <h3>Login</h3>
-                        <form onSubmit={this.onSubmit} className="overlay-form">
-                            <label className={this.state.errorClass}>{this.state.error}</label>
+                        <div className="form-group">
+                            <input ref="email" className="form-control" type="email" placeholder="Enter email" required />
+                        </div>
 
-                            <div className="form-group">
-                                <input ref="email" className="form-control" type="email" placeholder="Enter email" required />
-                            </div>
+                        <div className="form-group">
+                            <input ref="password" className="form-control" type="password" placeholder="Enter password" required />
+                        </div>
 
-                            <div className="form-group">
-                                <input ref="password" className="form-control" type="password" placeholder="Enter password" required />
-                            </div>
+                        <div className="form-group">
+                            <label><input ref="remember" type="checkbox" /> Stay logged in?</label>
+                        </div>
 
-                            <div className="form-group">
-                                <label><input ref="remember" type="checkbox" /> Stay logged in?</label>
-                            </div>
-
-                            <button className="btn btn-default">Login</button>
-                        </form>
-                    </div>
+                        <button className="btn btn-default">Login</button>
+                    </form>
                 </div>
             );
         }
     });
 
     // The overlay for registration.
-    var RegisterApp = React.createClass({
+    var RegisterForm = React.createClass({
         // Defining the initial state for this appliaction.
         getInitialState: function () {
             return {
@@ -144,33 +140,29 @@
         // Rendering the RegisterApp.
         render: function () {
             return (
-                <div className={'overlay-container ' + this.props.fadeClass}>
-                    <div onClick={this.props.exit} className="overlay-background"></div>
+                <div>
+                    <h3>Register</h3>
+                    <form onSubmit={this.onSubmit} className="overlay-form">
+                        <label className={this.state.errorClass}>{this.state.error}</label>
 
-                    <div className="overlay-form-container">
-                        <h3>Register</h3>
-                        <form onSubmit={this.onSubmit} className="overlay-form">
-                            <label className={this.state.errorClass}>{this.state.error}</label>
+                        <div className="form-group">
+                            <input ref="email" className="form-control" type="email" placeholder="Enter email" required />
+                        </div>
 
-                            <div className="form-group">
-                                <input ref="email" className="form-control" type="email" placeholder="Enter email" required />
-                            </div>
+                        <div className="form-group">
+                            <input ref="username" className="form-control" type="text" placeholder="Enter username" required />
+                        </div>
 
-                            <div className="form-group">
-                                <input ref="username" className="form-control" type="text" placeholder="Enter username" required />
-                            </div>
+                        <div className="form-group">
+                            <input ref="password" className="form-control" type="password" placeholder="Enter password" required />
+                        </div>
 
-                            <div className="form-group">
-                                <input ref="password" className="form-control" type="password" placeholder="Enter password" required />
-                            </div>
+                        <div className="form-group">
+                            <input ref="cpassword" className="form-control" type="password" placeholder="Confirm password" required />
+                        </div>
 
-                            <div className="form-group">
-                                <input ref="cpassword" className="form-control" type="password" placeholder="Confirm password" required />
-                            </div>
-
-                            <button className="btn btn-default">Register</button>
-                        </form>
-                    </div>
+                        <button className="btn btn-default">Register</button>
+                    </form>
                 </div>
             );
         }
@@ -179,14 +171,19 @@
     // Managing the login & register overlays.
     var OverlayManager = React.createClass({
         render: function () {
-            if (this.props.showLogin)
-                return <LoginApp exit={this.props.exitLogin}
-                                fadeClass={this.props.closeLogin ? 'fade-out' : 'fade-in'} />
-            else if (this.props.showRegister)
-                return <RegisterApp exit={this.props.exitRegister}
-                                    fadeClass={this.props.closeRegister ? 'fade-out' : 'fade-in'} />
-            else
-                return <span></span>
+            return (
+                <span>
+                    <PageOverlay hideOverlay={this.props.hideLogin}
+                                 show={this.props.showLogin}>
+                        <LoginForm />
+                    </PageOverlay>
+
+                    <PageOverlay hideOverlay={this.props.hideRegister}
+                                 show={this.props.showRegister}>
+                        <RegisterForm />
+                    </PageOverlay>
+                </span>
+            );
         }
     });
 
@@ -198,9 +195,7 @@
             return {
                 logged: null,
                 showLogin: false,
-                closeLogin: false,
                 showRegister: false,
-                closeRegister: false
             };
         },
 
@@ -210,34 +205,6 @@
             checkLogged(function (logged) {
                 this.setState({ logged: logged });
             }.bind(this));
-        },
-
-        // Exitting the login overlay.
-        exitLogin: function () {
-            this.setState({
-                closeLogin: true
-            });
-
-            setTimeout(function () {
-                this.setState({
-                    showLogin: false,
-                    closeLogin: false
-                })
-            }.bind(this), 100);
-        },
-
-        // Exiting the registration overlay.
-        exitRegister: function () {
-            this.setState({
-                closeRegister: true
-            });
-
-            setTimeout(function () {
-                this.setState({
-                    showRegister: false,
-                    closeRegister: false
-                })
-            }.bind(this), 100);
         },
 
         // Removing the authorization cookie and reloading the page.
@@ -257,12 +224,11 @@
             } else if (this.state.logged === false) {
                 return (
                     <span>
-                        <OverlayManager showLogin={this.state.showLogin}
-                                        closeLogin={this.state.closeLogin}
-                                        exitLogin={this.exitLogin}
-                                        showRegister={this.state.showRegister}
-                                        closeRegister={this.state.closeRegister}
-                                        exitRegister={this.exitRegister} />
+                        <OverlayManager hideLogin={function () { this.setState({ showLogin: false }); }.bind(this)}
+                                        showLogin={this.state.showLogin}
+
+                                        hideRegister={function () { this.setState({ showRegister: false }); }.bind(this)}
+                                        showRegister={this.state.showRegister} />
 
                         <a onClick={function () { this.setState({ showLogin: true }); }.bind(this)} href="#" className="top-bar-text secondary">Login</a>
                         <a onClick={function () { this.setState({ showRegister: true }); }.bind(this)} href="#" className="top-bar-text secondary">Register</a>

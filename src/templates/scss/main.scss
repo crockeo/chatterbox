@@ -117,39 +117,3 @@ a.top-bar-text.secondary {
 .max-height {
     height: 100%;
 }
-
-/*
- * Styling window-wide overlay form.
- */
-.overlay-container {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    z-index: 1;
-    left: 0px;
-    top: 0px;
-}
-
-.overlay-background {
-    position: absolute;
-    background: #333;
-    opacity: 0.6;
-    height: 100%;
-    width: 100%;
-    z-index: 2;
-}
-
-.overlay-form-container {
-    margin-left: calc(50% - (400px / 2));
-    padding: 12px 64px 24px 32px;
-    position: absolute;
-    border-radius: 8px;
-    background: #fff;
-    margin-top: 10%;
-    width: 400px;
-    z-index: 2;
-}
-
-.overlay-form {
-    padding-left: 32px;
-}
