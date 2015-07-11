@@ -215,7 +215,7 @@ a .tab-element-close {
 }
 
 /* .tab-add-form */
-$slideDuration: 0.25s;
+$slideDuration: 0.10s;
 $formWidth: 160px;
 
 @include keyframes(expandLeft) { from { width: 0px;        } to { width: $formWidth; } }
