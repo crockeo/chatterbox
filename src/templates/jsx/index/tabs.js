@@ -42,6 +42,36 @@ withGlobal(function (global) {
             };
         },
 
+        // Registering some socket listeners upon this component mounting.
+        componentDidMount: function () {
+            this.props.socket.on('joinerr', function (response) {
+                this.setState({
+                    errorClass: response.err ? 'text-danger' : 'text-warning',
+                    error     : response.message
+
+                });
+            }.bind(this));
+
+            this.props.socket.on('join', function (response) {
+                this.setState({
+                    errorClass: 'text-success',
+                    error     : 'Successfully joined a channel.'
+                });
+
+                this.props.hideOverlay();
+            }.bind(this));
+        },
+
+        // Clearing the errorClass and error before it's being shown.
+        componentWillReceiveProps: function (nextProps) {
+            if (nextProps.show) {
+                this.setState({
+                    errorClass: '',
+                    error: ''
+                });
+            }
+        },
+
         // Attempting to join a new channel (with a given password).
         onSubmit: function (e) {
             e.preventDefault();
@@ -94,11 +124,6 @@ withGlobal(function (global) {
         // Registering on a confirmed join with the list of tabs.
         componentDidMount: function () {
             this.props.socket.on('join', this.realAddTab);
-
-            // Logging errors upon failing to join a channel.
-            this.props.socket.on('joinerr', function (err) {
-                console.log(err.message);
-            });
         },
 
         // Selecting a new tab.
@@ -199,13 +224,21 @@ withGlobal(function (global) {
             for (var i = 0; i < this.state.tabs.length; i++)
                 elems.push(this.makeElem(i));
 
+            var hideOverlay = function () {
+                this.setState({
+                    showNewTabForm: false
+                });
+            }.bind(this);
+
             return (
                 <div className="tab-list">
                     {elems}
 
-                    <PageOverlay hideOverlay={function () { this.setState({ showNewTabForm: false }); }.bind(this)}
-                                 show={this.state.showNewTabForm}>
-                        <NewTabForm socket={this.props.socket} />
+                    <PageOverlay show={this.state.showNewTabForm}
+                                 hideOverlay={hideOverlay}>
+                        <NewTabForm show={this.state.showNewTabForm}
+                                    socket={this.props.socket}
+                                    hideOverlay={hideOverlay} />
                     </PageOverlay>
 
                     <span onClick={function () { this.setState({ showNewTabForm: true }); }.bind(this)}
