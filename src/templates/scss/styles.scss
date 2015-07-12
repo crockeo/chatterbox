@@ -1,0 +1,14 @@
+@import 'config.scss';
+
+/*
+ * Styling Bootstrap's form-controls to be more in-line style-wise with the rest
+ * of the site.
+ */
+input.form-control {
+    border-color: $primaryColor;
+
+    background: linear-gradient(
+        darken(#fff, 12%),
+        #fff 10%
+    );
+}
