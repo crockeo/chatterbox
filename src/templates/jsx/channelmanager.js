@@ -60,7 +60,7 @@ withGlobal(function (global) {
                     }
 
                     if (json.success)
-                        this.refs.newPassword.value = '';
+                        this.refs.newPassword.getDOMNode().value = '';
                 }.bind(this)
             });
         },
