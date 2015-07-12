@@ -105,8 +105,8 @@ function join(io, socket) {
             // have the correct password (on a password-authorization channel).
             if (dbChannel.authType == 'password' || dbChannel.authType == 'invite') {
                 database.schema.InChannel.find({
-                    username: channel.username,
-                    chatName: channel.chatName
+                    username: validation.username,
+                    chatName: channel.name
                 }, function (err, matches) {
                     if (err || matches.length === 0) {
                         // Even if there are no InChannels we still try to log
