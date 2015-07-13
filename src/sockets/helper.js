@@ -13,8 +13,9 @@ function serverMessage(message) {
         channel : 'system',
         username: 'System',
         picture : 'system',
-        text    : message,
-        time    : new Date()
+        time    : new Date(),
+        type    : 'text',
+        data    : { text: message }
     };
 }
 

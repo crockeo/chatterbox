@@ -27,8 +27,9 @@ function message(io, socket) {
             channel : msg.channel,
             username: validation.username,
             picture : validation.picture ? validation.picture : 'blank_user_profile.jpg',
-            text    : msg.text,
-            time    : msg.time
+            time    : msg.time,
+            type    : msg.type,
+            data    : msg.data
         });
     };
 }

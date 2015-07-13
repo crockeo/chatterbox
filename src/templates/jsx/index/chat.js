@@ -9,29 +9,9 @@
 // Code //
 
 withGlobal(function (global) {
-    // A React component to represent a single message.
-    var Message = React.createClass({
-        // Rendering this single message.
-        render: function () {
-            return (
-                <p className="chat-message">
-                    <span className="chat-profile-container">
-                        <img src={'/api/image?id=' + this.props.message.picture}
-                             title={this.props.message.username}
-                             alt={this.props.message.username}
-                             className="chat-profile-picture" />
-                    </span>
-
-                    <span className="chat-message-text">{this.props.message.text}</span>
-                    <span className="chat-message-time"> - {this.props.message.time.toString()}</span>
-                </p>
-            );
-        }
-    });
-
     // Displaying other people's (and your own) messages.
     var Messages = React.createClass({
-        //
+        // Trying to scroll down upon receiving a new message.
         componentDidUpdate: function (prevProps) {
             if (prevProps.messages !== this.props.messages) {
                 var div = this.refs.chatMessages.getDOMNode();
@@ -77,8 +57,9 @@ withGlobal(function (global) {
                     channel : this.props.channel,
                     username: auth.username,
                     auth    : auth.auth,
-                    text    : text,
-                    time    : new Date()
+                    time    : new Date(),
+                    type    : 'text',
+                    data    : { text: text }
                 });
 
                 chatInput.value = '';

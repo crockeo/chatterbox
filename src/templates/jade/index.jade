@@ -2,10 +2,11 @@ extends ./wrapper.jade
 
 block css
     link(rel='stylesheet' href='/static/css/index.css')
-        
+
 block js
     script(type='application/javascript' src='/socket.io/socket.io.js')
 
+    script(type='application/javascript' src='/static/js/index/message.js')
     script(type='application/javascript' src='/static/js/index/users.js')
     script(type='application/javascript' src='/static/js/index/chat.js')
     script(type='application/javascript' src='/static/js/index/tabs.js')
