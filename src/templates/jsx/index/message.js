@@ -40,6 +40,32 @@ withGlobal(function (global) {
         }
     });
 
+    // Rendering a message of type 'img'.
+    var ImageMessage = React.createClass({
+        render: function () {
+            var imgURL = '/api/image?id=' + this.props.message.data.imgId;
+
+            return (
+                <MessageContainer message={this.props.message}>
+                    <a target='_blank' href={imgURL}>
+                        <img src={'/api/image?id=' + this.props.message.data.imgId} />
+                    </a>
+                </MessageContainer>
+            );
+        }
+    });
+
+    // Rendering a default message if the message type is not recognized.
+    var DefaultMessage = React.createClass({
+        render: function () {
+            return (
+                <MessageContainer message={this.props.message}>
+                    <span className="chat-message-text">INVALID CHAT FORMAT</span>
+                </MessageContainer>
+            );
+        }
+    });
+
     // A React class to take in message data and render it to the DOM.
     var Message = React.createClass({
         // Pawning off the rendering to other React classes based on the 'type'
@@ -47,6 +73,10 @@ withGlobal(function (global) {
         render: function () {
             if (this.props.message.type === 'text')
                 return <TextMessage message={this.props.message} />
+            else if (this.props.message.type === 'img')
+                return <ImageMessage message={this.props.message} />
+            else
+                return <DefaultMessage message={this.props.message} />
         }
     });
 

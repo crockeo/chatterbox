@@ -71,11 +71,16 @@
     color: #888888;
 }
 
-.chat-form {
+.chat-form-container {
     background: $primaryColor;
     padding: 4px;
     height: 56px;
     margin: 0px;
+    width: 100%;
+}
+
+.chat-form {
+    display: inline;
 }
 
 .chat-input {
@@ -91,17 +96,22 @@
 }
 
 .chat-button {
+    width: calc(5% - 2px);
     border-radius: 0px;
     border-style: none;
     height: 48px;
     color: #fff;
-    width: 10%;
 
     background: linear-gradient(
         lighten($lightColor, 3%),
         $lightColor 20%,
         darken($lightColor, 3%) 80%
     );
+
+    &.left {
+        box-shadow: 4px 0px 0px $darkColor;
+        margin-right: 4px;
+    }
 
     &:active {
         box-shadow: 0px -1px 0px darken($darkColor, 12%);
@@ -110,6 +120,11 @@
             $darkColor 10%
         );
     }
+}
+
+.image-input {
+    visibility: hidden;
+    height: 0px;
 }
 
 /*
