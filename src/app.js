@@ -9,7 +9,7 @@
 // Imports //
 var io      = require('socket.io'),
     express = require('express'),
-    http    = require('http');
+    http    = require('http'),
     fs      = require('fs'),
 
     socketmanager = require('./sockets/manager.js'),

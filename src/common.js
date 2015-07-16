@@ -7,6 +7,7 @@
 /////////////
 // Imports //
 var bcrypt = require('bcrypt'),
+    crypto = require('crypto'),
 
     database = require('./database.js');
 
@@ -101,9 +102,18 @@ function generateAuthCookie(body, callback) {
     });
 }
 
+// A function to hash the contents of a Buffer using Node's crypto library's
+// implementating of SHA1.
+function hashBuffer(buffer, callback) {
+    var shasum = crypto.createHash('sha1');
+    shasum.update(buffer);
+    callback(shasum.digest('base64'));
+}
+
 /////////////
 // Exports //
 module.exports.allExists          = allExists;
 module.exports.isLoggedJSON       = isLoggedJSON;
 module.exports.isLogged           = isLogged;
 module.exports.generateAuthCookie = generateAuthCookie;
+module.exports.hashBuffer         = hashBuffer;

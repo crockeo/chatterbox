@@ -43,7 +43,7 @@ function post(req, res) {
     images.save({
         contentType: req.body.contentType,
         data       : req.body.data
-    }, function (err, id) {
+    }, function (err, data) {
         if (err) {
             console.log(String(err));
             res.json({
@@ -55,8 +55,8 @@ function post(req, res) {
             res.json({
                 error  : null,
                 success: true,
-                message: 'Saved the image!',
-                id     : id
+                message: data.newImg ? 'Saved the image!' : 'Image already existed.',
+                id     : data.id
             });
         }
     });

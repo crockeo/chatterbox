@@ -57,6 +57,7 @@ var schema = {
     Img: mongoose.model('Img', {
         id         : Number,
         contentType: String,
+        hash       : String,
         data       : Buffer
     }),
 

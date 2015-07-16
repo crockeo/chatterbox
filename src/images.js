@@ -30,17 +30,34 @@ function save(img, callback) {
         else
             id = imgs[0].id + 1;
 
-        new database.schema.Img({
-            id         : id,
-            contentType: img.contentType,
-            data       : new Buffer(img.data, 'binary')
-        }).save(function (err) {
-            if (err) {
-                callback(err);
-                return;
-            }
+        var data = new Buffer(img.data, 'binary');
+        common.hashBuffer(data, function (hash) {
+            console.log(hash);
+            database.schema.Img.find({
+                hash: hash
+            }, function (err, imgs) {
+                if (imgs.length > 0) {
+                    return callback(null, {
+                        newImg: false,
+                        id    : imgs[0].id
+                    });
+                }
 
-            callback(null, id);
+                new database.schema.Img({
+                    id         : id,
+                    contentType: img.contentType,
+                    hash       : hash,
+                    data       : new Buffer(img.data, 'binary')
+                }).save(function (err) {
+                    if (err)
+                        return callback(err);
+
+                    callback(null, {
+                        newImage: true,
+                        id      : id
+                    });
+                });
+            });
         });
     });
 }
