@@ -5,7 +5,7 @@ that I want done, but aren't yet.
 
 ## TODOs
 
-* Multimedia message formats.
+* Multimedia message formats.       - **DONE**
 * Caching messages.
 * Channel management.               - **DONE**
 * Password-channel authentication.  - **DONE**
