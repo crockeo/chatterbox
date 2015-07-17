@@ -32,7 +32,6 @@ function save(img, callback) {
 
         var data = new Buffer(img.data, 'binary');
         common.hashBuffer(data, function (hash) {
-            console.log(hash);
             database.schema.Img.find({
                 hash: hash
             }, function (err, imgs) {
