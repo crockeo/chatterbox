@@ -6,7 +6,8 @@
 
 /////////////
 // Imports //
-var helper = require('../helper.js');
+var database = require('../../database.js'),
+    helper   = require('../helper.js');
 
 //////////
 // Code //
@@ -23,13 +24,21 @@ function message(io, socket) {
             return;
         }
 
-        io.to(msg.channel).emit('message', {
+        // Creating an object to contain message data.
+        var msgData = {
             channel : msg.channel,
             username: validation.username,
             picture : validation.picture ? validation.picture : 'blank_user_profile.jpg',
             time    : msg.time,
             type    : msg.type,
             data    : msg.data
+        };
+
+        // Trying to cache the message.
+        new database.schema.Message(msgData).save(function (err) {
+            if (err)
+                console.log('Failed to cache message: ' + String(err));
+            io.to(msg.channel).emit('message', msgData);
         });
     };
 }

@@ -23,14 +23,14 @@ function getAuthLevel(channel, authCookie, callback) {
 
     common.isLoggedJSON(json, function (err, logged) {
         if (err || !logged)
-            return callback(err, 2);
+            return callback(err, 3);
 
         database.schema.InChannel.find({
             username: json.username,
             chatName: channel
         }, function (err, inChannels) {
             if (err || inChannels.length === 0)
-                return callback(err, 2);
+                return callback(err, 3);
             callback(null, inChannels[0].authLevel);
         });
     });

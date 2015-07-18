@@ -66,6 +66,16 @@ var schema = {
     ChannelPref: mongoose.model('ChannelPref', {
         username: String,
         channels: [String]
+    }),
+
+    // Representing a chat message in the database.
+    Message: mongoose.model('Message', {
+        channel : String,
+        username: String,
+        picture : String,
+        time    : Date,
+        type    : String,
+        data    : Object
     })
 };
 
