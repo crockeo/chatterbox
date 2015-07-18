@@ -149,7 +149,7 @@ withGlobal(function (global) {
                     </form>
 
                     <button onClick={this.simulateClick} className="chat-button">
-                        <span className="glyphicon glyphicon-plus"></span>
+                        <span className="glyphicon glyphicon-picture"></span>
                     </button>
 
                     <input onChange={this.uploadPicture}
