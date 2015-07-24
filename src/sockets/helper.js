@@ -67,6 +67,31 @@ function getCurrentUsers(callback) {
     }, 0);
 }
 
+// An alternative to getCurrentUsers that instead returns the set of users that
+// are currently connected to a given channel.
+//
+// In its current state, it has unnecessarily high time complexity because of
+// the nature of the existant data structure. If I move things around a little
+// with the rest of the project it can be greatly optimized.
+function getChannelUsers(channel, callback) {
+    if (typeof channel !== 'string' || typeof callback !== 'function')
+        throw new Error('Invalid arguments to getChannelUsers.');
+
+    var users = [];
+    for (var key in validated) {
+        if (validated.hasOwnProperty(key) && validated[key] !== undefined) {
+            if (validated[key].channels.indexOf(channel) !== -1) {
+                users.push({
+                    username: validated[key].username,
+                    picture : validated[key].picture
+                });
+            }
+        }
+    }
+
+    callback(users);
+}
+
 /////////////
 // Exports //
 module.exports.serverMessage    = serverMessage;
@@ -76,3 +101,4 @@ module.exports.getValidation    = getValidation;
 module.exports.joinChannel      = joinChannel;
 module.exports.leaveChannel     = leaveChannel;
 module.exports.getCurrentUsers  = getCurrentUsers;
+module.exports.getChannelUsers  = getChannelUsers;
