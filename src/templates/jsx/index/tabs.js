@@ -205,6 +205,8 @@ withGlobal(function (global) {
             this.setState({
                 tabs: tmp
             });
+
+            this.props.newTab(name);
         },
 
         // Rendering a single TabElement of the TabList.

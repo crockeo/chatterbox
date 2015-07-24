@@ -57,45 +57,7 @@ withGlobal(function (global) {
 
             this.props.socket.on('connect', function () {
                 this.setState({ connected: true });
-
-                makeRequest({
-                    method: 'GET',
-                    path: '/api/currentusers',
-
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-
-                    onload: function (response) {
-                        var userList;
-
-                        try       { userList = JSON.parse(response);                 }
-                        catch (e) { console.log('Could not get user list.'); return; }
-
-                        var users = {};
-                        for (var i = 0; i < userList.length; i++) {
-                            for (var j = 0; j < userList[i].channels.length; j++) {
-                                var v = {
-                                    username: userList[i].username,
-                                    picture : userList[i].picture
-                                };
-
-                                if (users[userList[i].channels[j]] === undefined)
-                                    users[userList[i].channels[j]] = [v];
-                                else
-                                    users[userList[i].channels[j]].push(v);
-                            }
-                        }
-
-                        this.setState({
-                            connected: true,
-                            users: users
-                        });
-
-                        var auth = Cookies.get('auth');
-                        this.props.socket.emit('register', auth);
-                    }.bind(this)
-                });
+                this.props.socket.emit('register', Cookies.get('auth'));
             }.bind(this));
 
             // Being alerted of the registration being complete.
@@ -168,13 +130,48 @@ withGlobal(function (global) {
             }
         },
 
+        // Functionality to run upon a new tab being added to the list of
+        // current tabs.
+        newTab: function (channel) {
+            makeRequest({
+                method: 'GET',
+                path: '/api/channel/data?channel=' + channel,
+
+                headers: { 'Accept': 'application/json' },
+
+                onload: function (response) {
+                    var json;
+
+                    try { json = JSON.parse(response); }
+                    catch (e) {
+                        console.log('Failed to parse /api/channel/data?channel=' + channel + ' response:');
+                        console.log('  ' + String(e));
+                    }
+
+                    if (json.success) {
+                        var messages = this.state.messages,
+                            users    = this.state.users;
+
+                        messages[channel] = json.data.messages;
+                        users[channel] = json.data.users;
+
+                        this.setState({
+                            messages: messages,
+                            users   : users
+                        });
+                    }
+                }.bind(this)
+            });
+        },
+
         // Rendering the whole app.
         render: function () {
             return (
                 <div className="max-height">
                     <TabList setChannel={function (channel) { this.setState({ channel: channel }) }.bind(this)}
                              currentTab={this.state.channel}
-                             socket={this.props.socket} />
+                             socket={this.props.socket}
+                             newTab={this.newTab} />
 
                     <ChatTab messages={this.state.messages[this.state.channel] ? this.state.messages[this.state.channel] : []}
                              users={this.state.users[this.state.channel] ? this.state.users[this.state.channel] : []}

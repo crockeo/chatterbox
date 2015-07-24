@@ -51,6 +51,5 @@ function initIO(io) {
 
 /////////////
 // Exports //
-module.exports.getCurrentUsers = helper.getCurrentUsers;
-module.exports.initSocket      = initSocket;
-module.exports.initIO          = initIO;
+module.exports.initSocket = initSocket;
+module.exports.initIO     = initIO;

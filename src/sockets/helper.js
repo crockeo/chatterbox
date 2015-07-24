@@ -46,29 +46,7 @@ function leaveChannel(id, name) {
         validated[id].channels.splice(idx, 1);
 }
 
-// Getting the set of users currently connected & validated by the server.
-function getCurrentUsers(callback) {
-    if (typeof callback !== 'function')
-        return;
-
-    setTimeout(function () {
-        var users = [];
-        for (var key in validated) {
-            if (validated.hasOwnProperty(key) && validated[key] !== undefined) {
-                users.push({
-                    username: validated[key].username,
-                    channels: validated[key].channels,
-                    picture : validated[key].picture
-                });
-            }
-        }
-
-        callback(users);
-    }, 0);
-}
-
-// An alternative to getCurrentUsers that instead returns the set of users that
-// are currently connected to a given channel.
+// A function that returns a list of users that exist in a given channel.
 //
 // In its current state, it has unnecessarily high time complexity because of
 // the nature of the existant data structure. If I move things around a little
@@ -100,5 +78,4 @@ module.exports.removeValidation = removeValidation;
 module.exports.getValidation    = getValidation;
 module.exports.joinChannel      = joinChannel;
 module.exports.leaveChannel     = leaveChannel;
-module.exports.getCurrentUsers  = getCurrentUsers;
 module.exports.getChannelUsers  = getChannelUsers;
