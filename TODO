@@ -1,7 +1,0 @@
-Here's a thing for when you come back to this tomorrow morning (or whenever it
-is).
-
-You just finished writing an API endpoint for the data about a channel. Now you
-want to go back to the front-end and change up the UI a little bit so it relies
-on this new endpoint to get channel messages and users upon a new channel being
-added.
