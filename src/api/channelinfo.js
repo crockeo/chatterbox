@@ -81,5 +81,5 @@ function get(req, res) {
 
 /////////////
 // Exports //
-module.exports.path = '/channelinfo';
+module.exports.path = '/channel/info';
 module.exports.get  = get;

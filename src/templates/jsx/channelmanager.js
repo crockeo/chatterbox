@@ -311,7 +311,7 @@ withGlobal(function (global) {
             } else {
                 makeRequest({
                     method: 'GET',
-                    path: '/api/channelinfo?channel=' + this.props.channel,
+                    path: '/api/channel/info?channel=' + this.props.channel,
 
                     headers: {
                         'Accept': 'application/json'

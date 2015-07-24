@@ -130,6 +130,6 @@ function post(req, res) {
 /////////////
 // Exports //
 module.exports.updateChannelPref = updateChannelPref;
-module.exports.path              = '/channelpref';
+module.exports.path              = '/channel/pref';
 module.exports.get               = get;
 module.exports.post              = post;

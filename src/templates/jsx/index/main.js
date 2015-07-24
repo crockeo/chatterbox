@@ -102,7 +102,7 @@ withGlobal(function (global) {
             this.props.socket.on('registered', function () {
                 makeRequest({
                     method: 'GET',
-                    path: '/api/channelpref',
+                    path: '/api/channel/pref',
 
                     onload: function (response) {
                         var json;
