@@ -12,6 +12,11 @@ var database = require('../../database.js'),
 //////////
 // Code //
 
+// Validating the name of a channel.
+function validateChannelName(name) {
+    return name !== 'system' && name !== '';
+}
+
 // Actually joining a given channel on a given socket.
 function doRealJoin(io, socket, channel) {
     setTimeout(function () {
@@ -37,8 +42,16 @@ function doRealJoin(io, socket, channel) {
 // A socket attempting to join a new channel.
 function join(io, socket) {
     return function (channel) {
+        var trimmedName = channel.name.trim();
+        if (!validateChannelName(trimmedName)) {
+            return socket.emit('joinerr', {
+                err    : new Error('Invalid channel name.'),
+                message:           'Invalid channel name.'
+            });
+        }
+
         database.schema.Channel.find({
-            name: channel.name
+            name: trimmedName
         }, function (err, channels) {
             if (err) {
                 socket.emit('joinerr', {
@@ -59,7 +72,7 @@ function join(io, socket) {
                 }
 
                 new database.schema.Channel({
-                    name    : channel.name,
+                    name    : trimmedName,
                     authType: 'invite',
                     password: null
                 }).save(function (err) {
@@ -74,7 +87,7 @@ function join(io, socket) {
 
                     new database.schema.InChannel({
                         username : validation.username,
-                        chatName : channel.name,
+                        chatName : trimmedName,
                         authLevel: 0
                     }).save(function (err) {
                         if (err) {
@@ -86,7 +99,7 @@ function join(io, socket) {
                             return;
                         }
 
-                        doRealJoin(io, socket, channel.name);
+                        doRealJoin(io, socket, trimmedName);
                     });
                 });
 
@@ -97,7 +110,7 @@ function join(io, socket) {
 
             // Automatically joining an open channel.
             if (dbChannel.authType == 'open') {
-                doRealJoin(io, socket, channel.name);
+                doRealJoin(io, socket, trimmedName);
                 return;
             }
 
@@ -106,7 +119,7 @@ function join(io, socket) {
             if (dbChannel.authType == 'password' || dbChannel.authType == 'invite') {
                 database.schema.InChannel.find({
                     username: validation.username,
-                    chatName: channel.name
+                    chatName: trimmedName
                 }, function (err, matches) {
                     if (err || matches.length === 0) {
                         // Even if there are no InChannels we still try to log
@@ -126,7 +139,7 @@ function join(io, socket) {
                             if (validation !== undefined) {
                                 return new database.schema.InChannel({
                                     username : validation.username,
-                                    chatName : channel.name,
+                                    chatName : trimmedName,
                                     authLevel: 0
                                 }).save(function (err) {
                                     if (err) {
@@ -138,13 +151,13 @@ function join(io, socket) {
                                         return;
                                     }
 
-                                    doRealJoin(io, socket, channel.name);
+                                    doRealJoin(io, socket, trimmedName);
                                 });
                             }
                         }
                     }
 
-                    doRealJoin(io, socket, channel.name);
+                    doRealJoin(io, socket, trimmedName);
                 });
 
                 return;
