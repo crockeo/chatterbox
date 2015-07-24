@@ -61,59 +61,30 @@ function get(req, res) {
     var fns = [],
         n   = 0;
 
-    // Getting the users if necessary.
-    if (req.query.users === undefined || req.query.users === 'true') {
-        console.log(':)');
-        fns.push(function (data, callback) {
-            getUsers(req, function (err, users) {
-                if (err)
-                    callback(err, data);
+    if (req.query.users    === undefined || req.query.users    === 'true')
+        fns.push({ fn: getUsers, name: 'users' });
+    if (req.query.messages === undefined || req.query.messages === 'true')
+        fns.push({ fn: getMessages, name: 'messages' });
 
-                data.users = users;
-
-                callback(null, data);
-            });
-        });
-    }
-
-    // Getting the messages if necessary.
-    if (req.query.messages === undefined || req.query.messages === 'true') {
-        fns.push(function (data, callback) {
-            getMessages(req, function (err, messages) {
-                if (err)
-                    callback(err, data);
-
-                data.messages = messages;
-
-                callback(null, data);
-            });
-        });
-    }
-
-    // Adding the function to publish channel info.
-    fns.push(function (data, callback) {
-        res.json({
-            error  : false,
-            success: JSON.stringify(data) !== '{}',
-            message: JSON.stringify(data) === '{}' ? 'You didn\'t request any data.' : 'Successfully retrieved channel data.',
-            data   : data
-        });
-    });
-
-    // Iterating through the functions in the
-    var caller = function (err, data) {
-        if (err) {
+    var caller = function (data) {
+        if (n == fns.length) {
             return res.json({
-                error  : err,
-                success: false,
-                message: 'Failed to construct channel data response: ' + String(err)
+                error  : false,
+                success: JSON.stringify(data) !== '{}',
+                message: JSON.stringify(data) === '{}' ? 'You didn\'t request any data.' : 'Successfully retrieved channel data.',
+                data   : data
             });
         }
 
-        fns[n++](data, caller);
+        fns[n].fn(req, function (err, rData) {
+            data[fns[n].name] = rData;
+            n++;
+
+            caller(data);
+        });
     };
 
-    caller(null, {});
+    caller({});
 }
 
 /////////////
