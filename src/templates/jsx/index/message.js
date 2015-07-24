@@ -12,13 +12,30 @@ withGlobal(function (global) {
     // A generic container across all message types.
     var MessageContainer = React.createClass({
         render: function () {
+            var img;
+
+            if (this.props.message.username === 'System') {
+                img = (
+                    <img src={'/api/image?id=' + this.props.message.picture}
+                            title={this.props.message.username}
+                            alt={this.props.message.username}
+                            className="chat-profile-picture" />
+                );
+            } else {
+                img = (
+                    <a href={'/profile.html?username=' + this.props.message.username}>
+                        <img src={'/api/image?id=' + this.props.message.picture}
+                                title={this.props.message.username}
+                                alt={this.props.message.username}
+                                className="chat-profile-picture" />
+                    </a>
+                );
+            }
+
             return (
                 <p className="chat-message">
                     <span className="chat-profile-container">
-                        <img src={'/api/image?id=' + this.props.message.picture}
-                             title={this.props.message.username}
-                             alt={this.props.message.username}
-                             className="chat-profile-picture" />
+                        {img}
                     </span>
 
                     {this.props.children}
