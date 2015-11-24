@@ -29,6 +29,14 @@ withGlobal(function (global) {
             'show'       : React.PropTypes.bool.isRequired
         },
 
+        // Setting up a hotkey to close the overlay.
+        componentDidMount: function () {
+            document.addEventListener('keyup', function (e) {
+                if (e.keyCode === 27)
+                    this.props.hideOverlay();
+            }.bind(this));
+        },
+
         // Calculating the fade class of an overlay container.
         calcContainerClass: function () {
             var c = 'page-overlay-container ';
