@@ -117,6 +117,15 @@ function join(io, socket) {
             // Trying to join a closed channel. One must either be invited or
             // have the correct password (on a password-authorization channel).
             if (dbChannel.authType == 'password' || dbChannel.authType == 'invite') {
+                if (validation === undefined) {
+                    return socket.emit('joinerr', {
+                        err    : new Error('Unregistered users cannot join closed channels.'),
+                        message:           'Unregistered users cannot join closed channels.'
+                    });
+
+                    return;
+                }
+
                 database.schema.InChannel.find({
                     username: validation.username,
                     chatName: trimmedName
