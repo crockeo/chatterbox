@@ -10,6 +10,7 @@
 var bcrypt = require('bcrypt'),
 
     database = require('../database.js'),
+    messages = require('../messages.js'),
     common   = require('../common.js');
 
 //////////
@@ -134,7 +135,12 @@ function post(req, res) {
 
                         user.email    = req.body.update.email    === undefined ? user.email    : req.body.update.email;
                         user.username = req.body.update.username === undefined ? user.username : req.body.update.username;
-                        user.picture  = req.body.update.picture  === undefined ? user.picture  : req.body.update.picture;
+
+                        var newpic = false;
+                        if (req.body.update.picture !== undefined) {
+                            user.picture = req.body.update.picture;
+                            newpic = true;
+                        }
 
                         if (req.body.update.npassword === '' && JSON.stringify(user) == oldUser) {
                             return res.json({
@@ -161,18 +167,25 @@ function post(req, res) {
                                     return;
                                 }
 
-                                common.generateAuthCookie({
-                                    username: user.username,
-                                    password: user.password,
-                                    remember: true
-                                }, function (err, authCookie) {
-                                    if (!err)
-                                        res.set('Set-Cookie', authCookie);
+                                messages.updatePictures(user, function (err) {
+                                    if (err) {
+                                        console.log('Failed to update message pictures.');
+                                        return;
+                                    }
 
-                                    res.json({
-                                        error: null,
-                                        success: true,
-                                        message: 'Updated your profile.'
+                                    common.generateAuthCookie({
+                                        username: user.username,
+                                        password: user.password,
+                                        remember: true
+                                    }, function (err, authCookie) {
+                                        if (!err)
+                                            res.set('Set-Cookie', authCookie);
+
+                                        res.json({
+                                            error: null,
+                                            success: true,
+                                            message: 'Updated your profile.'
+                                        });
                                     });
                                 });
                             });
