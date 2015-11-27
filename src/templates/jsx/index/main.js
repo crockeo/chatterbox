@@ -77,9 +77,8 @@ withGlobal(function (global) {
                         for (var i = 0; i < json.channels.length; i++)
                             this.props.socket.emit('join', { name: json.channels[i] });
 
-                        console.log(json.channel);
                         if (json.channel !== undefined)
-                            this.setState({ channel: json.channel });
+                            this.changeChannel(json.channel);
                     }.bind(this)
                 });
             }.bind(this));

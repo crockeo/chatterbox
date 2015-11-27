@@ -19,7 +19,7 @@ var database = require('../database.js'),
 // server itself.
 function updateChannelPref(username, channels, channel, callback) {
     if (typeof callback === 'undefined')
-        callback = function () { };
+        return;
 
     database.schema.ChannelPref.find({
         username: username
@@ -31,7 +31,8 @@ function updateChannelPref(username, channels, channel, callback) {
         if (channelPrefs.length === 0) {
             new database.schema.ChannelPref({
                 username: username,
-                channels: channels
+                channels: channels,
+                channel : channel
             }).save(function (err) {
                 callback(err);
             });
