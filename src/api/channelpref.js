@@ -17,7 +17,7 @@ var database = require('../database.js'),
 // Updating the channel preferences of a given user - publicly available to the
 // rest of the program such that you needn't query the API to use it from the
 // server itself.
-function updateChannelPref(username, channels, callback) {
+function updateChannelPref(username, channels, channel, callback) {
     if (typeof callback === 'undefined')
         callback = function () { };
 
@@ -44,6 +44,7 @@ function updateChannelPref(username, channels, callback) {
 
         var channelPref = channelPrefs[0];
         channelPref.channels = channels;
+        channelPref.channel  = channel;
 
         channelPref.save(function (err) {
             if (err)
@@ -101,7 +102,8 @@ function get(req, res) {
                 error   : false,
                 success : true,
                 message : 'Successfully got the list of channels.',
-                channels: channelPrefs[0].channels
+                channels: channelPrefs[0].channels,
+                channel : channelPrefs[0].channel
             });
         });
     });
@@ -109,7 +111,7 @@ function get(req, res) {
 
 // Attempting to update the list of channels a user is subscribed to.
 function post(req, res) {
-    common.allExists(req.body, ['channels'], function (exists) {
+    common.allExists(req.body, ['channels', 'channel'], function (exists) {
         if (req.cookies.auth === undefined || !exists) {
             return res.json({
                 error  : new Error('Malformed request.'),
@@ -118,11 +120,12 @@ function post(req, res) {
             });
         }
 
-        console.log('Got a request.');
+        // TODO: Complete this function?
+
         res.json({
-            error  : false,
+            error  : true,
             success: false,
-            message: ''
+            message: 'Endpoint not developed.'
         });
     });
 }

@@ -46,6 +46,9 @@ function leaveChannel(id, name) {
         validated[id].channels.splice(idx, 1);
 }
 
+// Setting the current channel of a given validation.
+function setChannel(id, channel) { validated[id].channel = channel; }
+
 // A function that returns a list of users that exist in a given channel.
 //
 // In its current state, it has unnecessarily high time complexity because of
@@ -78,4 +81,5 @@ module.exports.removeValidation = removeValidation;
 module.exports.getValidation    = getValidation;
 module.exports.joinChannel      = joinChannel;
 module.exports.leaveChannel     = leaveChannel;
+module.exports.setChannel       = setChannel;
 module.exports.getChannelUsers  = getChannelUsers;

@@ -76,6 +76,10 @@ withGlobal(function (global) {
                         //       out.
                         for (var i = 0; i < json.channels.length; i++)
                             this.props.socket.emit('join', { name: json.channels[i] });
+
+                        console.log(json.channel);
+                        if (json.channel !== undefined)
+                            this.setState({ channel: json.channel });
                     }.bind(this)
                 });
             }.bind(this));
@@ -130,6 +134,13 @@ withGlobal(function (global) {
             }
         },
 
+        // Notifying the server when you change a channel (to keep it cached for
+        // when you come back.
+        changeChannel: function (channel) {
+            this.setState({ channel: channel });
+            this.props.socket.emit('change', channel);
+        },
+
         // Functionality to run upon a new tab being added to the list of
         // current tabs.
         newTab: function (channel) {
@@ -168,7 +179,7 @@ withGlobal(function (global) {
         render: function () {
             return (
                 <div className="max-height">
-                    <TabList setChannel={function (channel) { this.setState({ channel: channel }) }.bind(this)}
+                    <TabList setChannel={this.changeChannel}
                              currentTab={this.state.channel}
                              socket={this.props.socket}
                              newTab={this.newTab} />

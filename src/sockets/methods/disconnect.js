@@ -17,7 +17,7 @@ function disconnect(io, socket) {
     return function () {
         var validation = helper.getValidation(socket.id);
         if (validation !== undefined) {
-            channelpref.updateChannelPref(validation.username, validation.channels, function (err) {
+            channelpref.updateChannelPref(validation.username, validation.channels, validation.channel, function (err) {
                 if (err) {
                     console.log('Failed to update channel preferences for "' + validation.username + '": ' + String(err));
                 }
