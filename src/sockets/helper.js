@@ -39,13 +39,13 @@ function getValidation(id) { return validated[id]; }
 
 // Joining or leaving a channel in the validation.
 function joinChannel(id, name) {
-    if (validation[id] === undefined)
+    if (validated[id] === undefined)
         return console.log('No such validated socket: ' + id);
     validated[id].channels.push(name);
 }
 
 function leaveChannel(id, name) {
-    if (validation[id] === undefined)
+    if (validated[id] === undefined)
         return console.log('No such validated socket: ' + id);
 
     var idx = validated[id].channels.indexOf(name);
@@ -55,7 +55,7 @@ function leaveChannel(id, name) {
 
 // Setting the current channel of a given validation.
 function setChannel(id, channel) {
-    if (validation[id] === undefined)
+    if (validated[id] === undefined)
         return console.log('No such validated socket: ' + id);
     validated[id].channel = channel;
 }
