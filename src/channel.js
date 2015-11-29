@@ -17,9 +17,8 @@ function getAuthLevel(channel, authCookie, callback) {
     var json;
 
     try { json = JSON.parse(authCookie); }
-    catch (e) {
-        return callback(new Error('Could not parse the authorization cookie.'), 2);
-    }
+    catch (e) { return callback(null, 3); }
+
 
     common.isLoggedJSON(json, function (err, logged) {
         if (err || !logged)
