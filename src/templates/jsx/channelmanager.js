@@ -4,348 +4,452 @@
 // Description:
 //   The front-end for rendering the channel management page.
 
+//////////
+// Code //
+
 withGlobal(function (global) {
-    // A form to change the authorization type of a channel.
-    var ChangeAuthForm = React.createClass({
-        getInitialState: function () {
-            return {
-                passwordGroupClass: ' hidden',
-                errorClass: '',
-                error: ''
-            };
+    // Displaying an authorization type.
+    function displayAuthType(authType) {
+        switch (authType) {
+            case 'open':     return 'open';
+            case 'password': return 'password protected';
+            case 'invite':   return 'invite only';
+            default:         return 'ERROR - No such auth type should exist: ' + authType;
+        }
+    }
+
+    // Displaying an authorization level.
+    function displayAuthLevel(authLevel) {
+        switch (authLevel) {
+            case 0:  return 'Admin';
+            case 1:  return 'Moderator';
+            case 2:  return 'User';
+            default: return 'ERROR - No such auth level should exist: ' + authLevel;
+        }
+    }
+
+    // Displaying a page to a user who should have internal information to a
+    // channel.
+    //
+    // If the user has the proper authorization levels, it will also display
+    // the option to edit appropriate values.
+    var IntViewPanel = React.createClass({
+        // Defining the required properties.
+        propTypes: {
+            channelInfo: React.PropTypes.object
         },
 
-        // Making sure that the proper value is selected by default.
-        componentDidMount: function () {
-            this.refs.newAuth.getDOMNode().value = this.props.authType;
-            this.checkPasswordGroupClass();
+        // Rendering the internal view type.
+        render: function () {
+            var admin = this.props.channelInfo.authLevel < 2;
+            return <h1>IntViewPanel {String(admin)}</h1>;
+        }
+    });
+
+    // Displaying a page to a user who should be shown external information to
+    // a channel.
+    var ExtViewPanel = React.createClass({
+        // Defining the required properties.
+        propTypes: {
+            channelInfo: React.PropTypes.object
         },
 
-        // Trying to submit a new authorization type for a channel.
-        onSubmit: function (e) {
-            e.preventDefault();
+        // Rendering the external view type.
+        render: function () {
+            console.log(this.props.channelInfo);
+            return (
+                <h3 className="text-center">You cannot view {this.props.channelInfo.name} info: {this.props.channelInfo.name} is {displayAuthType(this.props.channelInfo.authType)}.</h3>
+            );
+        }
+    });
 
-            var newAuth     = this.refs.newAuth.getDOMNode(),
-                newPassword = this.refs.newPassword.getDOMNode();
-
-            // Constructing the request data.
-            var json = {
-                channel: this.props.channel,
-                newAuth: newAuth.value
-            };
-
-            if (newPassword.value.trim() !== '')
-                json.newPassword = newPassword.value.trim();
-
-            // Trying to change the authtype.
-            makeRequest({
-                method: 'POST',
-                path: '/api/channel/authtype',
-
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-
-                body: JSON.stringify(json),
-
-                onload: function (response) {
-                    handleFormSubmit.bind(this)(response);
-
-                    var json;
-                    try { json = JSON.parse(response); }
-                    catch (e) {
-                        console.log('Failed to parse /api/channel/authtype response.');
-                        return;
-                    }
-
-                    if (json.success)
-                        this.refs.newPassword.getDOMNode().value = '';
-                }.bind(this)
-            });
+    // The actual display panel for the channel manager.
+    var ManagementPanel = React.createClass({
+        // Defining the required properties.
+        propTypes: {
+            channelInfo: React.PropTypes.object
         },
 
-        // Checking & possibly updating the passwordGroupClass.
-        checkPasswordGroupClass: function () {
-            if (this.refs.newAuth.getDOMNode().value === 'password')
-                this.setState({ passwordGroupClass: '' });
+        // Rendering the ManagementPanel.
+        render: function () {
+            var panel;
+            if (this.props.channelInfo.full)
+                panel = <IntViewPanel channelInfo={this.props.channelInfo} />;
             else
-                this.setState({ passwordGroupClass: ' hidden' });
-        },
-
-        // Rendering out this form.
-        render: function () {
-            return (
-                <form onSubmit={this.onSubmit}>
-                    <label className={this.state.errorClass}>{this.state.error}</label>
-                    <div className="form-group">
-                        <label>Authorization Type</label><br />
-                        <select onChange={this.checkPasswordGroupClass} ref="newAuth">
-                            <option value="open">Open</option>
-                            <option value="password">Password</option>
-                            <option value="invite">Invite</option>
-                        </select>
-                    </div>
-
-                    <div className={'form-group' + this.state.passwordGroupClass}>
-                        <input ref="newPassword" type="text" className="form-control" placeholder="Enter new channel password." />
-                    </div>
-
-                    <button className="btn btn-default">Submit</button>
-                </form>
-            );
-        }
-    });
-
-    // A form specifically made to invite users.
-    var InviteUserForm = React.createClass({
-        // Defining the form schema.
-        getInitialState: function () {
-            return {
-                errorClass: '',
-                error: ''
-            };
-        },
-
-        // Trying to submit an invite request for a user to a given channel.
-        onSubmit: function (e) {
-            e.preventDefault();
-
-            var username = this.refs.username.getDOMNode();
-
-            makeRequest({
-                method: 'POST',
-                path: '/api/invite',
-
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-
-                body: JSON.stringify({
-                    username: username.value,
-                    channel : this.props.channel
-                }),
-
-                onload: function (response) {
-                    handleFormSubmit.bind(this)(response);
-
-                    var json;
-                    try { json = JSON.parse(response); }
-                    catch (e) {
-                        console.log('Failed to parse /api/invite response.');
-                        return;
-                    }
-
-                    if (json.success) {
-                        username.value = '';
-                        setTimeout(function () {
-                            window.location = window.location;
-                        }, GLOBAL_REDIRECT_TIME);
-                    }
-                }.bind(this)
-            });
-        },
-
-        // Rendering the invite form.
-        render: function () {
-            return (
-                <form onSubmit={this.onSubmit}>
-                    <label className={this.state.errorClass}>{this.state.error}</label>
-
-                    <div className="form-group">
-                        <input ref="username" className="form-control" type="text" placeholder="Enter username." required />
-                    </div>
-
-                    <button className="btn btn-default" type="submit">Invite</button>
-                </form>
-            );
-        }
-    });
-
-    // Rendering a whole bunch of users at once.
-    var UsersRender = React.createClass({
-        render: function () {
-            var users = [];
-            for (var i = 0; i < this.props.users.length; i++) {
-                users.push(
-                    <tr key={i}>
-                        <td>{this.props.users[i].username}</td>
-                        <td>{this.props.users[i].authLevel}</td>
-                    </tr>
-                );
-            }
+                panel = <ExtViewPanel channelInfo={this.props.channelInfo} />;
 
             return (
-                <table className="table table-striped table-bordered">
-                    <tr>
-                        <th>Username</th>
-                        <th>Auth Level</th>
-                    </tr>
+                <div className="channelinfo-background">
+                    <div className="container channelinfo-foreground">
+                        <h2 className="text-center">{this.props.channelInfo.name} Info</h2>
 
-                    <tbody className="user-table">
-                        {users}
-                    </tbody>
-                </table>
-            );
-        }
-    });
-
-    // A class to represent an option for the chat channel.
-    var ChatOption = React.createClass({
-        // Defining the schema of the chat.
-        getInitialState: function () {
-            return {
-                toggled: false
-            };
-        },
-
-        // Toggling the portion of the ChatOption that's under the 'togglePortion'.
-        toggle: function () {
-            this.setState({ toggled: !this.state.toggled });
-        },
-
-        // Determining if the toggle-able section ought to be shown or not.
-        shouldShow: function () {
-            return 'chat-option-toggle' + (this.state.toggled ? '' : ' hidden');
-        },
-
-        // Calculating the direction the toggle button should be facing.
-        toggleDirection: function () {
-            return 'glyphicon glyphicon-menu-' + (this.state.toggled ? 'up' : 'down');
-        },
-
-        // Rendering out the ChatOption.
-        render: function () {
-            var toggleButton;
-            if (this.props.canExpand)
-                toggleButton = <h4 className="chat-option-change" onClick={this.toggle}><span className={this.toggleDirection()}></span></h4>;
-            else
-                toggleButton = <span></span>
-
-            return (
-                <div className="chat-option">
-                    <h4>{this.props.prefix}: <code>{this.props.value}</code></h4>
-
-                    <div className={this.shouldShow()}>
-                        {this.props.children}
+                        {panel}
                     </div>
-
-                    {toggleButton}
                 </div>
             );
         }
     });
 
-    // Displaying the chat channel manager if you did receive full informtaion.
+    // Utilities to view and manage channels.
     var ChannelManager = React.createClass({
-        render: function () {
-            return (
-                <div className="container">
-                    <h2>{this.props.info.name}</h2>
+        // Defining the required properties.
+        propTypes: {
+            channel: React.PropTypes.string
+        },
 
-                    <ChatOption value={this.props.info.authType}
-                                prefix="Authorization Type"
-                                canExpand={true}>
-                        <ChangeAuthForm authType={this.props.info.authType}
-                                        channel={this.props.channel} />
-                    </ChatOption>
-
-                    <ChatOption value={String(this.props.info.exists)}
-                                canExpand={false}
-                                prefix="Exists" />
-
-                    <ChatOption value={String(this.props.info.users.length)}
-                                canExpand={true}
-                                prefix="Users">
-                        <InviteUserForm channel={this.props.channel} />
-
-                        <hr className="dark-hr" />
-
-                        <UsersRender users={this.props.info.users} />
-                    </ChatOption>
-
-                    <ChatOption value={String(this.props.info.full)}
-                                canExpand={false}
-                                prefix="Full" />
-                </div>
-            );
-        }
-    });
-
-    // Displaying chat channel info if you didn't receive the full information.
-    var ChannelInfo = React.createClass({
-        render: function () {
-            return (
-                <div className="container">
-                    <h2>Channel</h2>
-                    <h3>Name: {this.props.info.name}</h3>
-                    <h3>Auth Type: {this.props.info.authType}</h3>
-                    <h3>Exists: {String(this.props.info.exists)}</h3>
-                    <h3>Full: {String(this.props.info.full)}</h3>
-
-                    <h2>Not authorized to see users.</h2>
-                </div>
-            );
-        }
-    });
-
-    // The main channel management app wrapper.
-    var ChannelManagement = React.createClass({
-        // Defining the initial schema of the app.
+        // Defining the channel schema.
         getInitialState: function () {
             return {
-                channelInfo: null
+                channelInfo: null,
+                exists:      false,
+                loaded:      false
             };
         },
 
-        // Performing functionality upon the ChannelManagement class mounting in the
-        // DOM.
+        // Loading the channel information after the component mounts.
         componentDidMount: function () {
-            if (this.props.channel === '') {
+            if (this.props.channel === undefined || this.props.channel === '') {
                 this.setState({
-                    channelInfo: {
-                        exists: false
-                    }
+                    exists: false,
+                    loaded: true
                 });
-            } else {
-                makeRequest({
-                    method: 'GET',
-                    path: '/api/channel/info?channel=' + this.props.channel,
 
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-
-                    onload: function (response) {
-                        var json;
-
-                        try       { json = JSON.parse(response);                                          }
-                        catch (e) { return console.log('Failed to parse response: "' + String(e)); + '"'; }
-
-                        this.setState({
-                            channelInfo: json
-                        });
-                    }.bind(this)
-                });
+                return;
             }
+
+            makeRequest({
+                method: 'GET',
+                path: '/api/channel/info?channel=' + this.props.channel,
+
+                headers: {
+                    'Accept': 'application/json'
+                },
+
+                onload: function (response) {
+                    var json;
+
+                    try       { json = JSON.parse(response); }
+                    catch (e) { return console.log('Failed to parse response: "' + String(e) + '"'); }
+
+                    this.setState({
+                        channelInfo: !json.exists ? null : {
+                            name:      json.name,
+                            authType:  json.authType,
+                            authLevel: json.authLevel,
+                            users:     json.users,
+                            full:      json.full
+                        },
+
+                        exists: json.exists,
+                        loaded: true
+                    });
+                }.bind(this)
+            });
         },
 
-        // Rendering this ChannelManagement screen.
         render: function () {
-            if (this.state.channelInfo === null)
-                return <h1 className="text-center">Loading...</h1>;
-            else if (this.state.channelInfo.full)
-                return <ChannelManager info={this.state.channelInfo} channel={this.props.channel} />;
-            else if (!this.state.channelInfo.full)
-                return <ChannelInfo info={this.state.channelInfo} />;
+            if (!this.state.loaded)
+                return <h1 className="text-center">Loading...</h1>
+            else if (!this.state.exists)
+                return <h1 className="text-center">Failed to load channel data: No such channel exists.</h1>;
+            else
+                return <ManagementPanel channelInfo={this.state.channelInfo} />
         }
     });
 
-    // Rendering the ChannelManagement object upon the page being loaded.
+    // Rendering the ChannelManager object upon the page being loaded.
     document.addEventListener('DOMContentLoaded', function () {
-        var channel = getQueryParam('channel');
-
-        React.render(<ChannelManagement channel={channel} />, document.getElementById('reactWrapper'));
+        React.render(
+            <ChannelManager channel={getQueryParam('channel')} />,
+            document.getElementById('reactWrapper')
+        );
     });
 });
+
+//withGlobal(function (global) {
+    //// A form to change the authorization type of a channel.
+    //var ChangeAuthForm = React.createClass({
+        //getInitialState: function () {
+            //return {
+                //passwordGroupClass: ' hidden',
+                //errorClass: '',
+                //error: ''
+            //};
+        //},
+
+        //// Making sure that the proper value is selected by default.
+        //componentDidMount: function () {
+            //this.refs.newAuth.getDOMNode().value = this.props.authType;
+            //this.checkPasswordGroupClass();
+        //},
+
+        //// Trying to submit a new authorization type for a channel.
+        //onSubmit: function (e) {
+            //e.preventDefault();
+
+            //var newAuth     = this.refs.newAuth.getDOMNode(),
+                //newPassword = this.refs.newPassword.getDOMNode();
+
+            //// Constructing the request data.
+            //var json = {
+                //channel: this.props.channel,
+                //newAuth: newAuth.value
+            //};
+
+            //if (newPassword.value.trim() !== '')
+                //json.newPassword = newPassword.value.trim();
+
+            //// Trying to change the authtype.
+            //makeRequest({
+                //method: 'POST',
+                //path: '/api/channel/authtype',
+
+                //headers: {
+                    //'Content-Type': 'application/json',
+                    //'Accept': 'application/json'
+                //},
+
+                //body: JSON.stringify(json),
+
+                //onload: function (response) {
+                    //handleFormSubmit.bind(this)(response);
+
+                    //var json;
+                    //try { json = JSON.parse(response); }
+                    //catch (e) {
+                        //console.log('Failed to parse /api/channel/authtype response.');
+                        //return;
+                    //}
+
+                    //if (json.success)
+                        //this.refs.newPassword.getDOMNode().value = '';
+                //}.bind(this)
+            //});
+        //},
+
+        //// Checking & possibly updating the passwordGroupClass.
+        //checkPasswordGroupClass: function () {
+            //if (this.refs.newAuth.getDOMNode().value === 'password')
+                //this.setState({ passwordGroupClass: '' });
+            //else
+                //this.setState({ passwordGroupClass: ' hidden' });
+        //},
+
+        //// Rendering out this form.
+        //render: function () {
+            //return (
+                //<form onSubmit={this.onSubmit}>
+                    //<label className={this.state.errorClass}>{this.state.error}</label>
+                    //<div className="form-group">
+                        //<label>Authorization Type</label><br />
+                        //<select onChange={this.checkPasswordGroupClass} ref="newAuth">
+                            //<option value="open">Open</option>
+                            //<option value="password">Password</option>
+                            //<option value="invite">Invite</option>
+                        //</select>
+                    //</div>
+
+                    //<div className={'form-group' + this.state.passwordGroupClass}>
+                        //<input ref="newPassword" type="text" className="form-control" placeholder="Enter new channel password." />
+                    //</div>
+
+                    //<button className="btn btn-default">Submit</button>
+                //</form>
+            //);
+        //}
+    //});
+
+    //// A form specifically made to invite users.
+    //var InviteUserForm = React.createClass({
+        //// Defining the form schema.
+        //getInitialState: function () {
+            //return {
+                //errorClass: '',
+                //error: ''
+            //};
+        //},
+
+        //// Trying to submit an invite request for a user to a given channel.
+        //onSubmit: function (e) {
+            //e.preventDefault();
+
+            //var username = this.refs.username.getDOMNode();
+
+            //makeRequest({
+                //method: 'POST',
+                //path: '/api/invite',
+
+                //headers: {
+                    //'Content-Type': 'application/json',
+                    //'Accept': 'application/json'
+                //},
+
+                //body: JSON.stringify({
+                    //username: username.value,
+                    //channel : this.props.channel
+                //}),
+
+                //onload: function (response) {
+                    //handleFormSubmit.bind(this)(response);
+
+                    //var json;
+                    //try { json = JSON.parse(response); }
+                    //catch (e) {
+                        //console.log('Failed to parse /api/invite response.');
+                        //return;
+                    //}
+
+                    //if (json.success) {
+                        //username.value = '';
+                        //setTimeout(function () {
+                            //window.location = window.location;
+                        //}, GLOBAL_REDIRECT_TIME);
+                    //}
+                //}.bind(this)
+            //});
+        //},
+
+        //// Rendering the invite form.
+        //render: function () {
+            //return (
+                //<form onSubmit={this.onSubmit}>
+                    //<label className={this.state.errorClass}>{this.state.error}</label>
+
+                    //<div className="form-group">
+                        //<input ref="username" className="form-control" type="text" placeholder="Enter username." required />
+                    //</div>
+
+                    //<button className="btn btn-default" type="submit">Invite</button>
+                //</form>
+            //);
+        //}
+    //});
+
+    //// Rendering a whole bunch of users at once.
+    //var UsersRender = React.createClass({
+        //render: function () {
+            //var users = [];
+            //for (var i = 0; i < this.props.users.length; i++) {
+                //users.push(
+                    //<tr key={i}>
+                        //<td>{this.props.users[i].username}</td>
+                        //<td>{this.props.users[i].authLevel}</td>
+                    //</tr>
+                //);
+            //}
+
+            //return (
+                //<table className="table table-striped table-bordered">
+                    //<tr>
+                        //<th>Username</th>
+                        //<th>Auth Level</th>
+                    //</tr>
+
+                    //<tbody className="user-table">
+                        //{users}
+                    //</tbody>
+                //</table>
+            //);
+        //}
+    //});
+
+    //// A class to represent an option for the chat channel.
+    //var ChatOption = React.createClass({
+        //// Defining the schema of the chat.
+        //getInitialState: function () {
+            //return {
+                //toggled: false
+            //};
+        //},
+
+        //// Toggling the portion of the ChatOption that's under the 'togglePortion'.
+        //toggle: function () {
+            //this.setState({ toggled: !this.state.toggled });
+        //},
+
+        //// Determining if the toggle-able section ought to be shown or not.
+        //shouldShow: function () {
+            //return 'chat-option-toggle' + (this.state.toggled ? '' : ' hidden');
+        //},
+
+        //// Calculating the direction the toggle button should be facing.
+        //toggleDirection: function () {
+            //return 'glyphicon glyphicon-menu-' + (this.state.toggled ? 'up' : 'down');
+        //},
+
+        //// Rendering out the ChatOption.
+        //render: function () {
+            //var toggleButton;
+            //if (this.props.canExpand)
+                //toggleButton = <h4 className="chat-option-change" onClick={this.toggle}><span className={this.toggleDirection()}></span></h4>;
+            //else
+                //toggleButton = <span></span>
+
+            //return (
+                //<div className="chat-option">
+                    //<h4>{this.props.prefix}: <code>{this.props.value}</code></h4>
+
+                    //<div className={this.shouldShow()}>
+                        //{this.props.children}
+                    //</div>
+
+                    //{toggleButton}
+                //</div>
+            //);
+        //}
+    //});
+
+    //// Displaying the chat channel manager if you did receive full informtaion.
+    //var ChannelManager = React.createClass({
+        //render: function () {
+            //return (
+                //<div className="container">
+                    //<h2>{this.props.info.name}</h2>
+
+                    //<ChatOption value={this.props.info.authType}
+                                //prefix="Authorization Type"
+                                //canExpand={true}>
+                        //<ChangeAuthForm authType={this.props.info.authType}
+                                        //channel={this.props.channel} />
+                    //</ChatOption>
+
+                    //<ChatOption value={String(this.props.info.exists)}
+                                //canExpand={false}
+                                //prefix="Exists" />
+
+                    //<ChatOption value={String(this.props.info.users.length)}
+                                //canExpand={true}
+                                //prefix="Users">
+                        //<InviteUserForm channel={this.props.channel} />
+
+                        //<hr className="dark-hr" />
+
+                        //<UsersRender users={this.props.info.users} />
+                    //</ChatOption>
+
+                    //<ChatOption value={String(this.props.info.full)}
+                                //canExpand={false}
+                                //prefix="Full" />
+                //</div>
+            //);
+        //}
+    //});
+
+    //// Displaying chat channel info if you didn't receive the full information.
+    //var ChannelInfo = React.createClass({
+        //render: function () {
+            //return (
+                //<div className="container">
+                    //<h2>Channel</h2>
+                    //<h3>Name: {this.props.info.name}</h3>
+                    //<h3>Auth Type: {this.props.info.authType}</h3>
+                    //<h3>Exists: {String(this.props.info.exists)}</h3>
+                    //<h3>Full: {String(this.props.info.full)}</h3>
+
+                    //<h2>Not authorized to see users.</h2>
+                //</div>
+            //);
+        //}
+    //});
+
+//});

@@ -1,45 +1,20 @@
-/*
- * Styling all of the chat management options.
+@import 'config';
+
+#reactWrapper {
+    height: calc(100% - 67px);
+}
+
+/* Coding the colors for the background and foreground of the channel info
+ * sections.
  */
-.chat-option {
-    box-shadow: 0px 1px 0px #333, 0px 2px 4px #333;
-    margin-bottom: 32px;
-    background: #f0f0f3;
-    border-radius: 4px;
-    padding: 8px 10px;
-    margin-left: 8px;
+.channelinfo-background {
+    background: $lighterColor;
+    height: 100%;
 }
 
-@media (max-width: 640px) {
-    .chat-option {
-        width: 100%;
-    }
-}
-
-@media (min-width: 640px) {
-    .chat-option {
-        width: 60%;
-    }
-}
-
-.chat-option-toggle {
-    margin: 0px 20px;
-}
-
-.chat-option-change {
-    margin-left: 8px;
-    cursor: pointer;
-    color: #666;
-}
-
-.dark-hr {
-    border-color: #333;
-    background: #333;
-}
-
-tbody.user-table {
-    overflow-y: scroll;
-    max-height: 100px;
-    height: 100px;
-    width: 100%;
+.channelinfo-foreground {
+    box-shadow: -2px 0px 0px $darkColor, -2px 0px 2px $darkColor,
+                 2px 0px 0px $darkColor,  2px 0px 2px $darkColor;
+    background: #fff;
+    height: 100%;
 }

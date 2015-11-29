@@ -39,16 +39,17 @@ function get(req, res) {
         data.exists   = true;
 
         channel.getAuthLevel(req.query.channel, req.cookies.auth, function (err, authLevel) {
+            data.authLevel = authLevel;
+
             if (err) {
                 data.full    = false;
                 data.message = String(err);
 
+                console.log('Failed to get channel auth level: ' + String(err));
                 return res.json(data);
             }
 
-            switch (authLevel) {
-            case 0:
-            case 1:
+            if (data.authType === 'open' || authLevel < 3) {
                 database.schema.InChannel.find({
                     chatName: req.query.channel
                 }, function (err, inChannels) {
@@ -65,15 +66,11 @@ function get(req, res) {
 
                     res.json(data);
                 });
-
-                break;
-            case 2:
-            default:
+            } else {
                 data.full    = false;
                 data.message = 'You do not have the authentication level to get full chat information.';
 
                 res.json(data);
-                break;
             }
         });
     });
