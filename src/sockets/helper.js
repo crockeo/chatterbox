@@ -38,16 +38,27 @@ function removeValidation(id) { validated[id] = undefined; }
 function getValidation(id) { return validated[id]; }
 
 // Joining or leaving a channel in the validation.
-function joinChannel(id, name) { validated[id].channels.push(name); }
+function joinChannel(id, name) {
+    if (validation[id] === undefined)
+        return console.log('No such validated socket: ' + id);
+    validated[id].channels.push(name);
+}
 
 function leaveChannel(id, name) {
+    if (validation[id] === undefined)
+        return console.log('No such validated socket: ' + id);
+
     var idx = validated[id].channels.indexOf(name);
     if (idx != -1)
         validated[id].channels.splice(idx, 1);
 }
 
 // Setting the current channel of a given validation.
-function setChannel(id, channel) { validated[id].channel = channel; }
+function setChannel(id, channel) {
+    if (validation[id] === undefined)
+        return console.log('No such validated socket: ' + id);
+    validated[id].channel = channel;
+}
 
 // A function that returns a list of users that exist in a given channel.
 //
