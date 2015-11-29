@@ -64,8 +64,20 @@ if (process.argv[si] === 'cleandb') {
         };
 
         removeSchema(0, function () {
-            console.log('Done!');
-            process.exit();
+            console.log('Adding default data...');
+
+            new database.schema.Channel({
+                name    : 'main',
+                authType: 'open',
+                password: ''
+            }).save(function (err) {
+                if (err)
+                    console.log('Failed to create the default channel.');
+
+                console.log('Done!');
+                process.exit();
+            });
+
         });
     });
 
