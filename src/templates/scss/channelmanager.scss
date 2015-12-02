@@ -1,7 +1,93 @@
 @import 'config';
 
+$transitionWidth: 700px;
+$intviewRightWidth: 50%;
+
+/* For some reason there's a #reactWrapper div that surrounds my code that makes
+ * all of this stuff not be 100% height unless I have this piece here.
+ */
 #reactWrapper {
     height: calc(100% - 67px);
+}
+
+/* Managing the left and right panes for the internal view.
+ */
+@media (max-width: $transitionWidth) {
+    .intview-left {
+        width: 100%;
+    }
+
+    .intview-right {
+        width: 100%;
+    }
+}
+
+@media (min-width: $transitionWidth) {
+    .intview-left {
+        width: calc(100% - #{$intviewRightWidth});
+        float: left;
+        margin: 0px;
+    }
+
+    .intview-right {
+        width: $intviewRightWidth;
+        float: right;
+        margin: 0px;
+    }
+}
+
+/* The edit button for changing a channel's authorization type.
+ */
+.edit-authType {
+    font-size: 16px;
+    cursor: pointer;
+    color: #999;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+/* Styling to do with the list of users on the right-hand side of the page.
+ */
+.intview-userlist {
+    margin-right: 16px;
+    margin-left: 8px;
+    padding: 6px;
+}
+
+.user {
+    width: calc(100% - 8px);
+    border-radius: 4px;
+    background: #fff;
+    padding: 6px;
+    margin: 4px;
+}
+
+.user-name {
+    vertical-align: middle;
+    line-height: 28px;
+    font-size: 24px;
+}
+
+.user-authLevel {
+    vertical-align: middle;
+    line-height: 28px;
+    font-size: 16px;
+    color: #555;
+}
+
+.user-edit {
+    vertical-align: middle;
+    line-height: 28px;
+    margin-left: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    color: #999;
+
+    &:hover {
+        text-decoration: underline;
+    }
 }
 
 /* Coding the colors for the background and foreground of the channel info

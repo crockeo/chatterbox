@@ -24,9 +24,55 @@ withGlobal(function (global) {
             case 0:  return 'Admin';
             case 1:  return 'Moderator';
             case 2:  return 'User';
+            case 3:  return 'Non-User';
             default: return 'ERROR - No such auth level should exist: ' + authLevel;
         }
     }
+
+    // A single user in the userlist of IntViewPanel.
+    var User = React.createClass({
+        // Defining the required properties.
+        propTypes: {
+            authLevel: React.PropTypes.number,
+            username:  React.PropTypes.string,
+            admin:     React.PropTypes.bool
+        },
+
+        // Getting the initial state of the user.
+        getInitialState: function () {
+            return { editing: false };
+        },
+
+        // Submitting whatever changes to a user.
+        submitChanges: function () {
+
+        },
+
+        // Going into edit-user mode.
+        toggleEdit: function () {
+            this.setState({ editing: !this.state.editing });
+        },
+
+        // Rendering the user.
+        render: function () {
+            if (this.state.editing) {
+                return (
+                    <div className="user">
+                        <span className="user-edit" onClick={this.submitChanges}>Submit</span>
+                        <span className="user-edit" onClick={this.toggleEdit}>Back</span>
+                    </div>
+                );
+            } else {
+                return (
+                    <div className="user">
+                        <span className="user-name">{this.props.username}</span>
+                        <span className="user-authLevel"> - {displayAuthLevel(this.props.authLevel)}</span>
+                        {this.props.admin ? <span className="user-edit" onClick={this.toggleEdit}>Edit</span> : <span></span>}
+                    </div>
+                );
+            }
+        }
+    });
 
     // Displaying a page to a user who should have internal information to a
     // channel.
@@ -41,8 +87,33 @@ withGlobal(function (global) {
 
         // Rendering the internal view type.
         render: function () {
-            var admin = this.props.channelInfo.authLevel < 2;
-            return <h1>IntViewPanel {String(admin)}</h1>;
+            var admin    = this.props.channelInfo.authLevel < 2,
+                userlist = [];
+
+            for (var i = 0; i < this.props.channelInfo.users.length; i++)
+                userlist.push(<User authLevel={this.props.channelInfo.users[i].authLevel}
+                                    username={this.props.channelInfo.users[i].username}
+                                    admin={admin}
+                                    key={i} />);
+
+            console.log(this.props.channelInfo);
+            return (
+                <div>
+                    <div className="intview-left">
+                        <h3>You are {this.props.channelInfo.authLevel === 0 ? 'an' : 'a'} {displayAuthLevel(this.props.channelInfo.authLevel)}.</h3>
+                        <h3>
+                            {this.props.channelInfo.name} is {displayAuthType(this.props.channelInfo.authType)}. {this.props.channelInfo.authLevel < 2 ? <span className="edit-authType">Change</span> : <span></span>}
+                        </h3>
+                    </div>
+
+                    <div className="intview-right">
+                        <h3>Users</h3>
+                        <div className="intview-userlist">
+                            {userlist}
+                        </div>
+                    </div>
+                </div>
+            );
         }
     });
 
