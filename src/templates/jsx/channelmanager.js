@@ -40,17 +40,58 @@ withGlobal(function (global) {
 
         // Getting the initial state of the user.
         getInitialState: function () {
-            return { editing: false };
+            return {
+                editing: false,
+                error: ""
+            };
         },
 
         // Submitting whatever changes to a user.
         submitChanges: function () {
+            makeRequest({
+                method: 'POST',
+                path: '/api/channel/rank',
+
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept':       'application/json'
+                },
+
+                body: JSON.stringify({
+                    channel:  'test',
+                    username: 'Crockeo',
+                    rank:     2
+                }),
+
+                onload: function (response) {
+                    var json;
+
+                    try { json = JSON.parse(response); }
+                    catch (e) {
+                        return console.log('Failed to parse response from /channel/rank: ' + String(e));
+                    }
+
+                    if (json.error || !json.success) {
+                        this.setState({
+                            error: json.message
+                        });
+                    } else
+                        this.toggleEdit();
+                }.bind(this)
+            });
+        },
+
+        // Attempting to kick this user from the channel.
+        kickUser: function () {
 
         },
 
         // Going into edit-user mode.
         toggleEdit: function () {
-            this.setState({ editing: !this.state.editing });
+            this.setState({
+                editing: !this.state.editing,
+                error: ""
+            });
         },
 
         // Rendering the user.
@@ -58,7 +99,20 @@ withGlobal(function (global) {
             if (this.state.editing) {
                 return (
                     <div className="user">
+                        <h4 className="text-danger">{this.state.error}</h4>
+
+                        <span className="user-name">{this.props.username}</span>
+
+                        <span className="user-authLevel"> - </span>
+
+                        <select>
+                            <option value="0">Admin</option>
+                            <option value="1">Moderator</option>
+                            <option value="2">User</option>
+                        </select>
+
                         <span className="user-edit" onClick={this.submitChanges}>Submit</span>
+                        <span className="user-edit" onClick={this.kickUser}>Kick</span>
                         <span className="user-edit" onClick={this.toggleEdit}>Back</span>
                     </div>
                 );
